@@ -193,7 +193,7 @@ function shell() {
   const links = nav.map(([id, label, mark]) => `<button type="button" class="nav-link${id === state.view ? ' selected' : ''}" data-action="go" data-value="${id}" ${id === state.view ? 'aria-current="page"' : ''}>${icon(mark, 19)}${label}</button>`).join('');
   byId('header').innerHTML = `<div class="header-inner content-width flex items-center justify-between">
     <button class="brand" type="button" data-action="go" data-value="welcome">${logo}</button>
-    ${landing ? `<nav class="landing-nav flex items-center" aria-label="Main navigation"><a href="#how-it-works" data-action="how">How it works</a>${button('Explore demo', 'persona', { style: 'plain', mark: 'external' })}</nav>` :
+    ${landing ? `<nav class="landing-nav flex items-center" aria-label="Main navigation"><a href="#why-it-matters" data-action="landing-section" data-value="why-it-matters">Why it matters</a><a href="#how-it-works" data-action="landing-section" data-value="how-it-works">How it works</a>${button('Explore demo', 'persona', { style: 'plain', mark: 'external' })}</nav>` :
       `<div class="header-actions"><span class="demo-tag"><span class="orange-dot"></span>Demo mode</span>
         ${button(personas[state.persona].name.split(' ')[0] + ' · Demo', 'persona', { style: 'secondary', mark: 'down' })}
         ${workspace ? `<button class="icon-button mobile-menu" type="button" data-action="menu" aria-label="Open navigation">${icon('menu')}</button>` : ''}</div>`}
@@ -207,18 +207,21 @@ function shell() {
 }
 
 function landingView() {
-  const steps = [['file','Upload'], ['chart','Analyse'], ['target','Match'], ['book','Upskill'], ['flag','Progress']];
-  const features = [
-    ['chart', 'Know Your Skills', 'See the strengths you already have and the experiences that show them.'],
-    ['compass', 'Explore Suitable Careers', 'Compare career paths in Malaysia and see where your skills fit.'],
-    ['route', 'Build Your Roadmap', 'Find training ideas and turn skill gaps into a practical learning plan.']
+  const steps = [
+    ['chart', 'Identify your skills', 'Spot strengths from your education, work, hobbies and self-learning.'],
+    ['compass', 'Explore career matches', 'See which Malaysian roles fit your skills, interests and qualifications, and why.'],
+    ['target', 'Find your skill gaps', 'Compare your profile with a role’s requirements to see what to learn next.'],
+    ['book', 'Find TVET pathways', 'Explore technical and vocational education and training. Check eligibility, fees and locations on official provider sites.'],
+    ['route', 'Build your roadmap', 'Plan courses, practical projects and qualifications, then track your progress.']
   ];
+  const dosm = 'https://www.dosm.gov.my/uploads/release-content/file_20260626114308.pdf';
+  const oecd = 'https://www.oecd.org/en/publications/oecd-economic-surveys-malaysia-2026_9ab6b826-en/full-report/improving-skills-education-and-training_562c8471.html';
   return `<div class="landing">
     <section class="hero content-width grid items-center">
       <div class="hero-copy">
         <p class="eyebrow"><span class="orange-dot"></span>Malaysia’s career navigator</p>
         <h1>Your skills have<br class="hero-break"> a future. <em>Jom find it.</em></h1>
-        <p class="lede">Upload your resume to discover your strengths, match with Malaysian careers, and plan your next skill upgrade.</p>
+        <p class="lede">Discover your strengths, explore Malaysian career paths and make a plan for what to learn next.</p>
         <div class="hero-actions">${goButton('Analyse My Resume', 'upload')}${button('Try with Demo Profile', 'persona', { style: 'secondary', mark: 'play' })}</div>
         ${notice('Prototype only. Your uploaded file stays on your device and is never read.', 'lock')}
       </div>
@@ -236,14 +239,32 @@ function landingView() {
         <figcaption><span><b>Fig. 1A</b> · The career path</span><span>Malaysia</span></figcaption>
       </figure>
     </section>
-    <section class="process" id="how-it-works" tabindex="-1" aria-labelledby="process-title">
-      <div class="content-width process-inner grid items-center"><h2 class="label" id="process-title">How it works</h2><ol class="process-list">
-        ${steps.map(([mark, label]) => `<li><span class="process-icon">${icon(mark, 18)}</span><span>${label}</span></li>`).join('')}
-      </ol></div>
+    <section class="mission" id="why-it-matters" tabindex="-1" aria-labelledby="mission-title">
+      <div class="content-width mission-layout">
+        <div>
+          <p class="label">Our mission</p>
+          <h2 id="mission-title">A clearer path <em>from education to work.</em></h2>
+          <p class="lede">JomWorkLah helps Malaysian students, fresh graduates and young jobseekers connect what they know with career opportunities and practical training.</p>
+        </div>
+        <div class="mission-evidence">
+          <div class="mission-stats">
+            <article class="panel mission-stat"><p class="mission-number">9.6%</p><h3>Youth unemployment</h3><p>Among Malaysians aged 15–24 in 2025, compared with 3.0% nationwide.</p></article>
+            <article class="panel mission-stat"><p class="mission-number">35.6%</p><h3>Skills mismatch</h3><p>Of tertiary-educated workers were in semi-skilled or low-skilled jobs in 2025.</p></article>
+          </div>
+          <p class="mission-context">The OECD points to gaps between education and industry needs, alongside a shortage of high-skilled jobs.</p>
+          <ul class="mission-sources" aria-label="Research sources">
+            <li><a href="${dosm}">DOSM labour force statistics ${icon('external', 13)}</a></li>
+            <li><a href="${oecd}">OECD Malaysia survey ${icon('external', 13)}</a></li>
+          </ul>
+        </div>
+      </div>
     </section>
-    <section class="features content-width" aria-labelledby="features-title">
+    <section class="features content-width" id="how-it-works" tabindex="-1" aria-labelledby="features-title">
+      <p class="label">How it works</p>
       <h2 id="features-title">From what you know to <em>what’s next.</em></h2>
-      <div class="feature-grid">${features.map(([mark, heading, description]) => `<article class="panel feature"><span class="tile-icon">${icon(mark, 22)}</span><h3>${heading}</h3><p>${description}</p></article>`).join('')}</div>
+      <p class="lede">The demo uses sample profiles and recommendations to preview the planned AI-guided journey, from conversational skills assessment to career matches informed by Malaysian labour-market data.</p>
+      <ol class="feature-grid">${steps.map(([mark, heading, description], index) => `<li class="panel feature"><div class="feature-top"><span class="tile-icon">${icon(mark, 20)}</span><span class="label">Step ${index + 1}</span></div><h3>${heading}</h3><p>${description}</p></li>`).join('')}</ol>
+      ${button('Explore demo', 'persona', { mark: 'arrow' })}
     </section>
   </div>`;
 }
@@ -982,8 +1003,8 @@ function resetDemo(all) {
 
 const actions = {
   go,
-  how() {
-    const section = byId('how-it-works');
+  'landing-section'(id) {
+    const section = byId(id);
     section.focus({ preventScroll: true });
     section.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   },
