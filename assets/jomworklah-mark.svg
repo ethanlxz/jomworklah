@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="JomWorkLah route mark">
+  <rect width="48" height="48" rx="13" fill="#f97316"/>
+  <path d="M12 34h6.5l6-12h5.5l6-9m-7 0h7v7" fill="none" stroke="#21160e" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="12" cy="34" r="2.7" fill="#21160e"/>
+</svg>
