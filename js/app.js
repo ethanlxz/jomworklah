@@ -780,10 +780,26 @@ function draw() {
 }
 
 function personaPicker() {
-  openModal('Choose a demo profile', `<p class="modal-description">Explore two fictional career journeys with different skills and interests.</p>
-    <div class="persona-grid">${Object.entries(personas).map(([id, persona]) => `<button type="button" class="panel persona-card" data-action="choose-persona" data-value="${id}">
-      <span class="persona-avatar ${id}">${persona.initials}</span><span><strong>${persona.name}</strong><span>${persona.headline}</span><small>${persona.location}</small></span>${icon('arrow', 18)}
-    </button>`).join('')}</div>`);
+  const paths = {
+    aina: { label: 'Data & technology', mark: 'chart', skills: ['excel', 'web'] },
+    amir: { label: 'Automotive & trades', mark: 'wrench', skills: ['tools', 'auto'] }
+  };
+  openModal('Choose a <em>demo profile</em>', `<p class="modal-description">Pick a fictional profile to explore a career path and build a learning roadmap.</p>
+    <div class="persona-grid">${Object.entries(personas).map(([id, persona]) => {
+      const path = paths[id];
+      return `<button type="button" class="persona-card persona-${id}" data-action="choose-persona" data-value="${id}">
+        <span class="persona-path"><span class="persona-icon">${icon(path.mark, 21)}</span><span>${path.label}</span></span>
+        <span class="persona-details">
+          <strong class="persona-name">${persona.name}</strong>
+          <span class="persona-headline">${persona.headline}</span>
+          <span class="chips">${path.skills.map(skill => chip(skillName(skill))).join('')}</span>
+        </span>
+        <span class="persona-footer">
+          <span class="persona-location">${icon('pin', 15)}${persona.location}</span>
+          <span class="persona-arrow" aria-hidden="true">${icon('arrow', 18)}</span>
+        </span>
+      </button>`;
+    }).join('')}</div>`);
 }
 
 function reviewPersona(id, from, keepFile = false) {

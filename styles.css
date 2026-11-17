@@ -394,15 +394,61 @@ dialog::backdrop { background: rgba(28,25,23,.46); }
 .modal-actions { display: flex; flex-wrap: wrap; justify-content: end; gap: 8px; margin-top: 17px; }
 .mini-requirements { display: grid; gap: 5px; }
 .mini-requirements > div { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); }
-.persona-grid { display: grid; gap: 9px; margin-top: 14px; }
-.persona-card { display: flex; align-items: center; gap: 12px; text-align: left; padding: 11px 14px; }
-.persona-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
-.persona-card > span:nth-child(2) { flex: 1; display: grid; gap: 2px; }
-.persona-card strong { color: var(--ink); font-size: 16px; }
-.persona-card > span:nth-child(2) span, .persona-card small { color: var(--muted); font-size: 13px; }
-.persona-card > svg { color: var(--orange-ink); }
-.persona-avatar { display: grid; align-items: center; justify-items: center; width: 42px; height: 42px; border-radius: 13px; background: var(--accent-light); color: var(--orange-ink); font: 600 14px/1 var(--mono); }
-.persona-avatar.amir { background: #e6e9dc; color: #3b4b35; }
+dialog:has(> .persona-grid) { width: min(100% - 32px, 720px); padding: clamp(18px, 4vw, 34px); }
+dialog:has(> .persona-grid) .modal-heading { align-items: flex-start; margin-bottom: 7px; }
+dialog:has(> .persona-grid) .modal-heading > h2 { padding-top: 3px; font-size: clamp(2.15rem, 5vw, 3.4rem); font-weight: 300; }
+dialog:has(> .persona-grid) .modal-heading em { color: var(--orange-ink); font-weight: inherit; }
+dialog:has(> .persona-grid) .modal-description { max-width: 48ch; }
+.persona-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+.persona-card {
+  --path-ink: var(--orange-ink);
+  --path-surface: #fff2e5;
+  --path-line: #eac5aa;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--white);
+  color: var(--ink);
+  text-align: left;
+  transition: border-color var(--ease), box-shadow var(--ease), transform var(--ease);
+}
+.persona-amir { --path-ink: #3b4b35; --path-surface: #eef0e7; --path-line: #c9d1bd; }
+.persona-card:hover, .persona-card:focus-visible { border-color: var(--path-line); box-shadow: var(--shadow); }
+.persona-card:hover { transform: translateY(-2px); }
+.persona-path {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  border-radius: 17px 17px 0 0;
+  border-bottom: 1px solid var(--path-line);
+  background: var(--path-surface);
+  color: var(--path-ink);
+  font: 500 11px/1.3 var(--mono);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.persona-icon { display: grid; place-items: center; width: 37px; height: 37px; flex: none; border: 1px solid var(--path-line); border-radius: 11px; background: var(--white); }
+.persona-details { display: grid; align-content: start; gap: 5px; padding: 16px 15px 14px; }
+.persona-name { font: 400 clamp(1.7rem, 4vw, 2.1rem)/1.05 var(--display); letter-spacing: -.02em; }
+.persona-headline { color: var(--muted); font-size: 14px; line-height: 1.4; }
+.persona-details .chips { margin-top: 7px; }
+.persona-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-inline: 15px; padding-block: 9px; border-top: 1px solid var(--line); }
+.persona-location { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 13px; }
+.persona-location svg { color: var(--path-ink); }
+.persona-arrow { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 50%; background: var(--path-surface); color: var(--path-ink); transition: background var(--ease), color var(--ease); }
+.persona-card:hover .persona-arrow, .persona-card:focus-visible .persona-arrow { background: var(--path-ink); color: var(--white); }
+@media (max-width: 540px) {
+  .persona-grid { grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+  .persona-path { padding-block: 7px; }
+  .persona-icon { width: 32px; height: 32px; border-radius: 9px; }
+  .persona-details { padding-block: 10px; }
+  .persona-details .chips { margin-top: 3px; }
+  .persona-footer { padding-block: 5px; }
+}
 .toast { position: fixed; z-index: 20; bottom: 19px; right: 19px; max-width: calc(100% - 38px); border-radius: 12px; box-shadow: var(--shadow); background: var(--ink); color: var(--white); font-size: 14px; padding: 11px 15px; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity var(--ease), transform var(--ease); }
 .toast.visible { opacity: 1; transform: translateY(0); }
 
