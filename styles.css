@@ -217,6 +217,9 @@ input[type="checkbox"] { accent-color: var(--orange-ink); width: 17px; height: 1
 .settings-info dt { font-weight: 600; }
 .settings-info dd { margin: 2px 0 10px; color: var(--muted); overflow-wrap: anywhere; }
 .settings-info .notice { margin: 0 0 9px; }
+.page-heading > .chip { flex: none; margin-bottom: 4px; }
+.skills-atlas-panel { padding: clamp(18px, 2.35vw, 29px); }
+.atlas-footnote { margin-top: 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .wide-break { display: none; }
 
 .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 16px; }
@@ -525,6 +528,7 @@ dialog:has(> .persona-grid) .modal-description { max-width: 48ch; }
   .result-line { align-items: flex-start; }
   .result-line > :last-child { max-width: 64%; text-align: right; }
   .comparison-name { align-items: flex-start; }
+  .page-heading > .chip { margin-bottom: 0; }
   .phase summary { padding-inline: 11px; }
   dialog { padding: 15px; }
 }

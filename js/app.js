@@ -25,6 +25,7 @@ const icons = {
   monitor: '<path d="M3 4h18v13H3zm6 17h6m-3-4v4"/>',
   wrench: '<path d="M15 4a5 5 0 0 0-6 6L3 16a2.8 2.8 0 0 0 4 4l6-6a5 5 0 0 0 7-6l-4 4-4-4z"/>',
   search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+  map: '<path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2V6Z"/><path d="M9 4v14m6-12v14"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   pin: '<path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0z"/><circle cx="12" cy="10" r="2"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
@@ -36,7 +37,7 @@ const nav = [
   ['dashboard', 'Overview', 'home'], ['skills', 'My Skills', 'chart'],
   ['careers', 'Explore Careers', 'compass'], ['gap', 'Skill Gap', 'target'],
   ['upskilling', 'Upskilling Hub', 'book'], ['roadmap', 'My Roadmap', 'route'],
-  ['profile', 'My Profile', 'user']
+  ['profile', 'My Profile', 'user'], ['atlas', 'Skills Atlas', 'map']
 ];
 const onboardingViews = ['welcome', 'upload', 'profile-review'];
 const storageKey = 'jomworklah-demo-v1';
@@ -771,6 +772,14 @@ function updateTask(control) {
   notify(control.checked ? 'Task marked complete.' : 'Task marked incomplete.');
 }
 
+function atlasView() {
+  return `${title('Skills Atlas', 'Where skills supply meets <em>industry demand.</em>', 'Explore illustrative training supply, hiring demand and skills gaps by state and district. Your profile’s location is outlined on the map.', chip('Demo data', true))}
+    <section class="panel skills-atlas-panel">
+      <div id="skills-atlas" class="skills-atlas"></div>
+      <p class="atlas-footnote">State and district boundaries use official DOSM/open data. Supply, demand, gap, employer and institution figures are illustrative demo data — not live labour-market statistics.</p>
+    </section>`;
+}
+
 function settingsView() {
   return `${title('My profile', 'Your profile and <em>preferences.</em>', 'Edit the example information that shapes your career matches and learning plan.', button('Change Demo Persona', 'persona', { style: 'secondary', mark: 'down' }))}
     <div class="settings-grid">
@@ -790,14 +799,18 @@ function settingsView() {
 const views = {
   welcome: landingView, upload: uploadView, 'profile-review': reviewView, dashboard: dashboardView,
   skills: skillsView, careers: careersView, gap: gapView, upskilling: trainingView,
-  roadmap: roadmapView, profile: settingsView
+  roadmap: roadmapView, profile: settingsView, atlas: atlasView
 };
 
 function draw() {
+  if (window.SkillsAtlas) window.SkillsAtlas.destroy();
   shell();
   main.innerHTML = views[state.view]();
   if (state.view === 'careers') updateCareerResults();
   if (state.view === 'upskilling') updateTrainingResults();
+  if (state.view === 'atlas' && window.SkillsAtlas) {
+    window.SkillsAtlas.mount(byId('skills-atlas'), { location: profile().location });
+  }
 }
 
 function personaPicker() {

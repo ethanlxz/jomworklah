@@ -13,6 +13,7 @@ Double-click `index.html` or open it from a modern browser. The app uses HTML, C
 3. Open **Find Training for These Gaps**. Review an example pathway, follow its official platform link or add a pathway to the roadmap.
 4. Open **My Roadmap**. Set weekly study time, generate the plan and complete one task. Check the updated count and open **Overview** to see the new completion percentage.
 5. Switch to **Amir Hakim** and select **Automotive Technician** to see different skills, technical training pathways and supervised projects. Each persona has its own target and roadmap.
+6. Open **Skills Atlas** in the sidebar to explore the map: switch between training supply, hiring demand and the gap, select a skill cluster, click a state and drill into its districts, or switch to the 3D view. The active persona’s location is outlined on the map.
 
 To test personalisation, edit Aina’s SQL evidence from 1 to 3 in **My Profile** and save. Compare the role’s compatibility and gap, then regenerate the roadmap.
 
@@ -24,12 +25,14 @@ To demonstrate resume selection, use a sample PDF or DOCX up to 5 MB. **Generate
 - Gap priority multiplies the missing evidence points by the illustrative role requirement’s weight. Training suggestions use overlapping gaps and use learning mode and location as tie-breakers.
 - Programmes are fictional pathways. Official platform links are directory entry points. Check the provider for course availability, fees, eligibility and recognition.
 - The roadmap uses fixed rules and role-specific projects. Completion tracks tasks. Edit evidence directly in **My Profile**.
+- The **Skills Atlas** tab is embedded from the standalone Skills Atlas prototype. State and district boundaries are official DOSM/open data; supply, demand, gap, employer and institution figures are illustrative synthetic data. The 3D view loads Three.js from a CDN and needs an internet connection; the 2D map works offline.
 - The browser can save demo preferences, targets and roadmap tasks using local storage. Edited profile text, evidence scores and selected file details are session-only. **Clear Saved Demo Progress** clears the stored journeys.
 
 ## Project files
 
 - `index.html` is the entry point, with `styles.css` for the design and responsive layout.
 - `js/mock-data.js` contains two fictional personas, eight career paths and ten example training pathways. `js/app.js` contains the interactions and scoring.
+- `skills-atlas.css`, `js/skills-atlas.js` and `js/skills-atlas-data.js` contain the scoped Skills Atlas map component, its state/district geometry data and its interactions.
 - `assets/jomworklah-logo.svg` contains the editable vector wordmark and route mark. `assets/jomworklah-mark.svg` is the standalone mark and favicon.
 - `assets/career-terrain.jpg` is the hero artwork, made with the built-in ImageGen tool.
 
