@@ -1,14 +1,17 @@
 import { Router } from 'express';
 import {
+  completeOnboarding,
   getMe,
   setInterests,
   setSkill,
   setSkills,
   updateProfile
 } from '../services/profile-service.js';
+import { restoreSampleProfile } from '../services/demo-service.js';
 import { validateBody, validateParams } from '../middleware/validate.js';
 import {
   interestsSchema,
+  onboardingSchema,
   paramsSkillSchema,
   profilePatchSchema,
   skillPatchSchema,
@@ -22,8 +25,20 @@ export function profileRouter() {
     res.json({ data: getMe(req.app.locals.db, req.user.id, req.user) });
   });
 
+  router.put('/me/onboarding', validateBody(onboardingSchema), (req, res) => {
+    const db = req.app.locals.db;
+    completeOnboarding(db, req.user.id, req.body);
+    res.json({ data: getMe(db, req.user.id, req.user) });
+  });
+
   router.patch('/me/profile', validateBody(profilePatchSchema), (req, res) => {
     res.json({ data: updateProfile(req.app.locals.db, req.user.id, req.body) });
+  });
+
+  router.post('/me/profile/sample-reset', (req, res) => {
+    const db = req.app.locals.db;
+    restoreSampleProfile(db, req.user.id);
+    res.json({ data: getMe(db, req.user.id, req.user) });
   });
 
   router.put('/me/skills', validateBody(skillsBulkSchema), (req, res) => {

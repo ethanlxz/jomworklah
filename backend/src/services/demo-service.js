@@ -45,7 +45,7 @@ export function createDemoSession(db, personaKey) {
   const userId = `usr_${crypto.randomUUID()}`;
 
   transaction(db, () => {
-    db.prepare("INSERT INTO users(id, kind) VALUES(?, 'demo_clone')").run(userId);
+    db.prepare("INSERT INTO users(id, kind, source_persona) VALUES(?, 'demo_clone', ?)").run(userId, personaKey);
 
     db.prepare(`
       INSERT INTO profiles(user_id, name, headline, qualification, field_of_study, location, experience, projects, budget, weekly_hours, learning_mode)
@@ -53,22 +53,46 @@ export function createDemoSession(db, personaKey) {
       FROM profiles WHERE user_id = ?
     `).run(userId, template.id);
 
-    db.prepare(`
-      INSERT INTO profile_skills(user_id, skill_id, evidence_level)
-      SELECT ?, skill_id, evidence_level FROM profile_skills WHERE user_id = ?
-    `).run(userId, template.id);
+    copyTemplateSkillsAndInterests(db, userId, template.id);
 
-    db.prepare(`
-      INSERT INTO profile_interests(user_id, interest_id)
-      SELECT ?, interest_id FROM profile_interests WHERE user_id = ?
-    `).run(userId, template.id);
-
-    db.prepare(`
-      INSERT INTO journeys(user_id, started, target_job_id)
-      SELECT ?, started, target_job_id FROM journeys WHERE user_id = ?
-    `).run(userId, template.id);
+    // Clones begin onboarding like the prototype; the template target stays as persona metadata.
+    db.prepare('INSERT INTO journeys(user_id, started, target_job_id) VALUES(?, 0, NULL)').run(userId);
   });
 
   const token = issueToken(db, userId);
-  return { token, userId };
+  return { token, userId, personaKey };
+}
+
+function copyTemplateSkillsAndInterests(db, userId, templateId) {
+  db.prepare('DELETE FROM profile_skills WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM profile_interests WHERE user_id = ?').run(userId);
+  db.prepare(`
+    INSERT INTO profile_skills(user_id, skill_id, evidence_level)
+    SELECT ?, skill_id, evidence_level FROM profile_skills WHERE user_id = ?
+  `).run(userId, templateId);
+  db.prepare(`
+    INSERT INTO profile_interests(user_id, interest_id)
+    SELECT ?, interest_id FROM profile_interests WHERE user_id = ?
+  `).run(userId, templateId);
+}
+
+export function restoreSampleProfile(db, userId) {
+  const user = db.prepare('SELECT kind, source_persona FROM users WHERE id = ?').get(userId);
+  if (user?.kind !== 'demo_clone' || !user.source_persona) {
+    throw new AppError(409, 'NOT_A_DEMO_CLONE', 'Only demo persona sessions can restore a sample profile.');
+  }
+  const template = db.prepare("SELECT id FROM users WHERE persona_key = ? AND kind = 'demo_template'").get(user.source_persona);
+  if (!template) throw new AppError(404, 'PERSONA_NOT_FOUND', `Unknown demo persona '${user.source_persona}'.`);
+
+  transaction(db, () => {
+    db.prepare(`
+      UPDATE profiles SET
+        (name, headline, qualification, field_of_study, location, experience, projects, budget, weekly_hours, learning_mode) =
+        (SELECT name, headline, qualification, field_of_study, location, experience, projects, budget, weekly_hours, learning_mode
+         FROM profiles WHERE user_id = ?),
+        updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+      WHERE user_id = ?
+    `).run(template.id, userId);
+    copyTemplateSkillsAndInterests(db, userId, template.id);
+  });
 }

@@ -49,8 +49,13 @@ export async function api(base, method, path, { token, body } = {}) {
   return { status: response.status, body: text ? JSON.parse(text) : null };
 }
 
-export async function demoToken(base, personaKey = 'aina') {
+export async function demoToken(base, personaKey = 'aina', { target = null } = {}) {
   const result = await api(base, 'POST', '/api/demo/session', { body: { personaKey } });
   if (result.status !== 201) throw new Error(`demo session failed: ${JSON.stringify(result.body)}`);
-  return result.body.data.token;
+  const { token } = result.body.data;
+  if (target) {
+    const selected = await api(base, 'PUT', '/api/me/target', { token, body: { jobId: target } });
+    if (selected.status !== 200) throw new Error(`target failed: ${JSON.stringify(selected.body)}`);
+  }
+  return token;
 }

@@ -77,9 +77,13 @@ erDiagram
 
 1. **Roadmap tasks are derived on read, not persisted.** This mirrors the prototype exactly (`roadmapPhases()` recomputes from the plan, profile, and saved courses on every render). Task IDs are deterministic (`skill-<skillId>`, `course-<courseId>`, `project-<n>`, `prepare-resume`, etc.), so only completion state needs storage. This guarantees newly saved courses appear in the training phase without a migration, and avoids duplicating generated prose. If tasks later become editable, promote them to a `roadmap_tasks` table with no domain-model disruption.
 
-2. **Target changes invalidate the roadmap.** The prototype reuses an old roadmap snapshot when the target changes, which produces mismatched foundation tasks. The backend fixes this: `PUT /api/me/target` deletes the roadmap row and its completions, and the UI must regenerate. This is a deliberate, documented divergence from the prototype.
+2. **Target changes invalidate the roadmap.** The prototype reuses an old roadmap snapshot when the target changes, which produces mismatched foundation tasks. The backend fixes this: `PUT /api/me/target` deletes the roadmap row, its completions and the saved courses (which were chosen for the old target), and the UI must regenerate. This is a deliberate, documented divergence from the prototype.
 
-3. **Demo personas are templates.** `POST /api/demo/session` deep-clones the seeded Aina/Amir profile into a fresh user, so multiple judges do not overwrite each other's progress. Templates carry `persona_key` and `kind='demo_template'`.
+3. **Demo personas are templates.** `POST /api/demo/session` deep-clones the seeded Aina/Amir profile, skills and interests into a fresh user, so multiple judges do not overwrite each other's progress. Templates carry `persona_key` and `kind='demo_template'`; clones record `source_persona` and start like the prototype (`started=false`, no target) so onboarding runs. The template's target is only surfaced as persona metadata.
+
+6. **Roadmaps freeze their inputs.** Generation stores the top-3 gap `skillIds` and top-2 suggested `courseIds` in `roadmaps.skill_ids_json`/`course_ids_json`. Reads build phases from that snapshot plus the currently saved courses, so editing skills does not rewrite foundations until the user regenerates. Rows without a snapshot are backfilled on first read.
+
+7. **API shapes follow the frontend.** Responses keep the canonical fields and add prototype aliases: profile `field`/`hours`/`mode`/`scores`/`interests`, course `provider` as an id string plus `providerName`/`providerUrl`, career `project`, task `course` objects and `progress.next`. Request bodies accept the same aliases.
 
 4. **Weights are not enforced by SQLite.** SQLite cannot express "weights sum to 1" across rows. Seed validation and tests assert the invariant instead.
 
@@ -378,23 +382,26 @@ Response envelope:
 | POST | `/session` | no | Create guest user + token |
 | GET | `/demo/personas` | no | List seeded persona summaries |
 | POST | `/demo/session` | no | Clone a demo persona and issue token |
-| GET | `/me` | yes | Profile, interests, skill scores, journey, roadmap summary |
+| GET | `/me` | yes | Profile (with `scores`/`interests`), skills, journey `{started,target,preferences,roadmap,added,completed}`, roadmap summary |
+| PUT | `/me/onboarding` | yes | Atomically save profile form + interests + scores and set `started` |
+| POST | `/me/profile/sample-reset` | yes | Demo clones only: restore persona profile/skills/interests, keep journey |
 | PATCH | `/me/profile` | yes | Update profile fields |
 | PUT | `/me/skills` | yes | Bulk upsert evidence scores |
 | PATCH | `/me/skills/:skillId` | yes | Update one evidence score |
 | PUT | `/me/interests` | yes | Replace interest set |
 | GET | `/skills` | no | Skill catalogue + evidence legend |
-| GET | `/interests` | no | Interest catalogue |
+| GET | `/interests` | no | Interest catalogue as `{id: label}` map |
+| GET | `/providers` | no | Provider catalogue as `{id: {name, url}}` map |
 | GET | `/careers?query=&category=&sort=match|title` | yes | Ranked careers with fit |
 | GET | `/careers/:id` | yes | Detail + requirements + per-skill gaps + explanation |
 | GET | `/training?view=suggested|all&skill=&source=&mode=&location=&budget=&sort=relevance|name` | yes | Ranked/filtered pathways |
 | GET | `/training/:id` | yes | Course detail + provider |
-| PUT | `/me/target` | yes | Set target; invalidates roadmap |
+| PUT | `/me/target` | yes | Set target (`jobId` or `target`); a change clears roadmap, completions and saved courses |
 | GET | `/me/courses` | yes | Saved courses |
-| POST | `/me/courses` | yes | Save course (appears in roadmap training phase) |
+| POST | `/me/courses` | yes | Save course (`courseId` or `id`); needs a target; 409 if already saved or in the roadmap snapshot |
 | DELETE | `/me/courses/:courseId` | yes | Unsave course |
 | GET | `/me/roadmap` | yes | Derive phases, tasks, progress |
-| POST | `/me/roadmap` | yes | Generate/regenerate with `weeklyHours`, optional `startDate` |
+| POST | `/me/roadmap` | yes | Generate/regenerate with `weeklyHours` (or `hours`), optional `startDate` (or `start-date`); freezes `skillIds`/`courseIds` |
 | PATCH | `/me/roadmap/tasks/:taskId` | yes | Mark complete/incomplete |
 | POST | `/me/roadmap/reset-progress` | yes | Clear completions, keep roadmap |
 | DELETE | `/me/journey` | yes | Clear target, roadmap, saved courses |

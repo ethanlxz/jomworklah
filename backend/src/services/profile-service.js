@@ -6,7 +6,8 @@ import {
   loadProfileRow,
   toProfile
 } from './catalogue.js';
-import { getJourney, getRoadmapSummary } from './journey-service.js';
+import { getJourneyState, getRoadmap } from './journey-service.js';
+import { profileView, roadmapSnapshotView } from '../api/serializers.js';
 
 const profileColumns = {
   name: 'name',
@@ -29,15 +30,14 @@ export function getProfile(db, userId) {
 
 export function updateProfile(db, userId, patch) {
   const entries = Object.entries(patch).filter(([key]) => key in profileColumns);
-  if (!entries.length) return getProfile(db, userId);
-
-  const assignments = entries.map(([key]) => `${profileColumns[key]} = ?`);
-  db.prepare(`
-    UPDATE profiles SET ${assignments.join(', ')}, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
-    WHERE user_id = ?
-  `).run(...entries.map(([, value]) => value), userId);
-
-  return getProfile(db, userId);
+  if (entries.length) {
+    const assignments = entries.map(([key]) => `${profileColumns[key]} = ?`);
+    db.prepare(`
+      UPDATE profiles SET ${assignments.join(', ')}, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+      WHERE user_id = ?
+    `).run(...entries.map(([, value]) => value), userId);
+  }
+  return getProfileState(db, userId);
 }
 
 export function getSkills(db, userId) {
@@ -110,13 +110,36 @@ export function setInterests(db, userId, interestIds) {
   return getInterests(db, userId);
 }
 
+export function completeOnboarding(db, userId, { interests, scores, ...profilePatch }) {
+  transaction(db, () => {
+    updateProfile(db, userId, profilePatch);
+    if (interests) setInterests(db, userId, interests);
+    if (scores) setSkills(db, userId, scores);
+    db.prepare(`
+      INSERT INTO journeys(user_id, started) VALUES(?, 1)
+      ON CONFLICT(user_id) DO UPDATE SET started = 1, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+    `).run(userId);
+  });
+}
+
 export function getMe(db, userId, user) {
+  const skills = getSkills(db, userId);
+  const roadmapState = getRoadmap(db, userId);
   return {
-    user: { id: user.id, kind: user.kind },
-    profile: getProfile(db, userId),
+    user: { id: user.id, kind: user.kind, personaKey: user.personaKey ?? null },
+    profile: getProfileState(db, userId, skills),
     interests: getInterests(db, userId),
-    skills: getSkills(db, userId),
-    journey: getJourney(db, userId),
-    roadmap: getRoadmapSummary(db, userId)
+    skills,
+    journey: getJourneyState(db, userId, roadmapState),
+    roadmap: roadmapState
+      ? { ...roadmapSnapshotView(roadmapState.roadmap), progress: roadmapState.progress }
+      : null
   };
+}
+
+export function getProfileState(db, userId, skills = getSkills(db, userId)) {
+  return profileView(getProfile(db, userId), {
+    scores: Object.fromEntries(skills.map(skill => [skill.id, skill.evidenceLevel])),
+    interests: getInterests(db, userId)
+  });
 }

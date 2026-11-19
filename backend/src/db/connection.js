@@ -16,6 +16,8 @@ export function openDatabase(dbPath) {
 }
 
 export function transaction(db, fn) {
+  // Nested calls join the outer transaction so composed service calls stay atomic.
+  if (db.isTransaction) return fn();
   db.exec('BEGIN');
   try {
     const result = fn();

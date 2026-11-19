@@ -171,6 +171,15 @@ const migrations = [
         PRIMARY KEY (user_id, task_id)
       );
     `
+  },
+  {
+    version: 2,
+    name: 'frontend-alignment',
+    sql: `
+      ALTER TABLE users ADD COLUMN source_persona TEXT;
+      ALTER TABLE roadmaps ADD COLUMN skill_ids_json TEXT;
+      ALTER TABLE roadmaps ADD COLUMN course_ids_json TEXT;
+    `
   }
 ];
 
