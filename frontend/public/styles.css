@@ -64,6 +64,9 @@ ul, ol { padding-left: 1.2em; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; border: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 .skip-link { position: fixed; top: 8px; left: 12px; z-index: 30; background: var(--white); padding: 8px 16px; transform: translateY(-140%); }
 .skip-link:focus { transform: translateY(0); }
+/* Root URL: only visible for the instant before the meta refresh fires. */
+.redirect-page { display: grid; place-items: center; min-height: 60vh; padding: 40px 22px; color: var(--muted); }
+.redirect-page a { color: var(--ink); }
 .label, .eyebrow { font: 800 11px/1.4 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--teal); }
 .eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--teal); }
 .orange-dot { flex: none; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
@@ -144,7 +147,7 @@ ul, ol { padding-left: 1.2em; }
 .tvet-strip { --tvet-gap: clamp(36px, 4.6vw, 64px); --tvet-logo-h: clamp(30px, 2.7vw, 38px); --tvet-fade: clamp(30px, 7vw, 92px); margin-top: clamp(20px, 2.2vw, 26px); overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--tvet-fade), #000 calc(100% - var(--tvet-fade)), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 var(--tvet-fade), #000 calc(100% - var(--tvet-fade)), transparent 100%); }
 .tvet-track { display: flex; width: max-content; margin: 0; padding: 0; list-style: none; animation: tvet-scroll 36s linear infinite; will-change: transform; }
 .tvet-item { display: flex; flex: none; align-items: center; margin-right: var(--tvet-gap); }
-.tvet-item img { width: auto; height: var(--tvet-logo-h); filter: grayscale(1); opacity: .6; }
+.tvet-item img { width: auto; height: var(--tvet-logo-h); filter: grayscale(1); opacity: .7; }
 @keyframes tvet-scroll { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
 .mission, .features { padding-block: clamp(34px, 4.5vw, 65px); scroll-margin-top: 83px; }
 .mission { position: relative; background: var(--stone); }
