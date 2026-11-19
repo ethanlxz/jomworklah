@@ -17,6 +17,33 @@ const interests = {
   electronics: 'Electronics'
 };
 
+const mbtiGroups = {
+  analyst: { label: 'Analyst', color: '#7a56b8', soft: '#efe9fa' },
+  diplomat: { label: 'Diplomat', color: '#1c8a63', soft: '#e2f4ea' },
+  sentinel: { label: 'Sentinel', color: '#2e6f9e', soft: '#e3eef7' },
+  explorer: { label: 'Explorer', color: '#b57b12', soft: '#fbf0d7' }
+};
+
+// The 16 MBTI types. Illustrations live in assets/mbti/<code>.png.
+const mbtiTypes = [
+  ['INTJ', 'Architect', 'analyst', 'Plans the long game'],
+  ['INTP', 'Logician', 'analyst', 'Follows the curious thread'],
+  ['ENTJ', 'Commander', 'analyst', 'Takes charge of the plan'],
+  ['ENTP', 'Debater', 'analyst', 'Challenges every assumption'],
+  ['INFJ', 'Advocate', 'diplomat', 'Quietly driven by purpose'],
+  ['INFP', 'Mediator', 'diplomat', 'Guided by personal values'],
+  ['ENFJ', 'Protagonist', 'diplomat', 'Helps others move forward'],
+  ['ENFP', 'Campaigner', 'diplomat', 'Spots possibility everywhere'],
+  ['ISTJ', 'Logistician', 'sentinel', 'Keeps the details right'],
+  ['ISFJ', 'Defender', 'sentinel', 'Looks after the team'],
+  ['ESTJ', 'Executive', 'sentinel', 'Runs the operation'],
+  ['ESFJ', 'Consul', 'sentinel', 'Brings people together'],
+  ['ISTP', 'Virtuoso', 'explorer', 'Learns by taking it apart'],
+  ['ISFP', 'Adventurer', 'explorer', 'Finds beauty in the everyday'],
+  ['ESTP', 'Entrepreneur', 'explorer', 'Acts first, adjusts fast'],
+  ['ESFP', 'Entertainer', 'explorer', 'Brings energy to the room']
+].map(([code, name, group, tagline]) => ({ code, name, group, tagline }));
+
 const skills = [
   ['excel', 'Excel', 'Digital', 'Organise, analyse and present information using spreadsheets.'],
   ['python', 'Python', 'Technical', 'Write scripts for automation, cleaning or analysis.'],
@@ -40,19 +67,19 @@ const skills = [
 
 const personas = {
   aina: {
-    name: 'Aina Rahman', initials: 'AR', headline: 'IT diploma graduate',
+    name: 'Aina Rahman', initials: 'AR', headline: 'IT diploma graduate', photo: 'personas/aina.jpg',
     qualification: 'Diploma', field: 'Information Technology', location: 'Selangor',
     experience: 'Helped a campus society maintain monthly reports and supported a small office with part-time administrative work.',
     projects: 'Built a campus attendance spreadsheet and report. Created a basic responsive site and practised Python in coursework.',
-    interests: ['data', 'technology'], budget: budgets[0], hours: 5, mode: 'Online',
+    interests: ['data', 'technology'], budget: budgets[0], hours: 5, mode: 'Online', mbti: 'INFJ',
     scores: { excel: 4, python: 2, sql: 1, 'data-viz': 1, web: 3, communication: 3, teamwork: 4, troubleshoot: 2, reporting: 3, marketing: 1 }
   },
   amir: {
-    name: 'Amir Hakim', initials: 'AH', headline: 'SPM leaver with workshop experience',
+    name: 'Amir Hakim', initials: 'AH', headline: 'SPM leaver with workshop experience', photo: 'personas/amir.jpg',
     qualification: 'SPM', field: 'General studies', location: 'Perak',
     experience: 'Assisted at a family motorcycle workshop in Perak under supervision, organising tools and helping document service jobs.',
     projects: 'Prepared a routine service checklist, logged recurring faults and observed basic electrical and sensor checks.',
-    interests: ['automotive', 'mechanical', 'electronics'], budget: budgets[0], hours: 8, mode: 'In person',
+    interests: ['automotive', 'mechanical', 'electronics'], budget: budgets[0], hours: 8, mode: 'In person', mbti: 'ISTP',
     scores: { tools: 4, troubleshoot: 3, auto: 3, electrical: 2, safety: 2, sensors: 1, communication: 3, teamwork: 3, excel: 1, sql: 0 }
   }
 };

@@ -136,6 +136,16 @@ ul, ol { padding-left: 1.2em; }
 .map-end { left: 75.55%; bottom: 78%; transform: translateX(-50%); }
 .hero-figure figcaption { display: flex; justify-content: space-between; gap: 8px; padding-top: 13px; color: var(--stone-gray); font: 400 11px/1.35 var(--mono); letter-spacing: .095em; text-transform: uppercase; }
 .hero-figure b { color: var(--orange-ink); }
+
+/* TVET institutions strip — grayscale logos in a seamless right-to-left loop
+   with a soft fade at both edges (Inklusif-style spacing and treatment). */
+.tvet-band { border-top: 1px solid var(--line); padding-block: clamp(24px, 3.2vw, 38px) clamp(22px, 3vw, 34px); }
+.tvet-band-title { max-width: 46ch; margin-inline: auto; padding-inline: 24px; text-align: center; font-family: var(--sans); font-size: clamp(.9rem, 1.1vw, 1rem); font-weight: 700; line-height: 1.5; letter-spacing: .01em; color: var(--muted); }
+.tvet-strip { --tvet-gap: clamp(36px, 4.6vw, 64px); --tvet-logo-h: clamp(32px, 2.9vw, 42px); --tvet-fade: clamp(30px, 7vw, 92px); margin-top: clamp(18px, 2.4vw, 28px); overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--tvet-fade), #000 calc(100% - var(--tvet-fade)), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 var(--tvet-fade), #000 calc(100% - var(--tvet-fade)), transparent 100%); }
+.tvet-track { display: flex; width: max-content; margin: 0; padding: 0; list-style: none; animation: tvet-scroll 36s linear infinite; will-change: transform; }
+.tvet-item { display: flex; flex: none; align-items: center; margin-right: var(--tvet-gap); }
+.tvet-item img { width: auto; height: var(--tvet-logo-h); filter: grayscale(1); opacity: .55; }
+@keyframes tvet-scroll { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
 .mission, .features { padding-block: clamp(34px, 4.5vw, 65px); scroll-margin-top: 83px; }
 .mission { position: relative; background: var(--stone); }
 .mission::before, .mission::after { content: ""; position: absolute; inset-inline: 0; height: 10px; background: radial-gradient(circle at 10px 10px, var(--stone) 6px, transparent 6.5px) 0 0 / 20px 10px repeat-x; pointer-events: none; }
@@ -221,6 +231,43 @@ input[type="checkbox"] { accent-color: var(--orange-ink); width: 17px; height: 1
 .settings-info dt { font-weight: 700; }
 .settings-info dd { margin: 2px 0 10px; color: var(--muted); overflow-wrap: anywhere; }
 .settings-info .notice { margin: 0 0 9px; }
+.mbti-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.mbti-head p { max-width: 58ch; color: var(--muted); font-size: 15px; margin-top: 8px; }
+.mbti-scroll-controls { display: flex; gap: 6px; flex: none; }
+.mbti-scroll-controls .icon-button { width: 40px; min-height: 40px; }
+#mbti-current { margin-top: 16px; }
+.mbti-current { display: flex; align-items: center; gap: 15px; padding: 12px 16px; border: 1px solid var(--mbti-color); border-radius: 10px; background: var(--mbti-soft); }
+.mbti-current .mbti-avatar { width: 86px; height: 77px; flex: none; }
+.mbti-current .label { font-size: 10px; color: var(--mbti-color); }
+.mbti-current h3 { display: flex; align-items: baseline; gap: 8px; margin-top: 3px; font-size: 1.35rem; color: var(--mbti-color); }
+.mbti-current h3 span { font-size: .85rem; font-weight: 700; color: var(--muted); }
+.mbti-current p:last-child { margin-top: 3px; color: var(--muted); font-size: 13px; }
+.mbti-grid { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 27px) / 4); gap: 9px; margin-top: 14px; padding: 3px 2px 8px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding-inline: 2px; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: rgba(23, 60, 53, .25) transparent; }
+.mbti-grid::-webkit-scrollbar { height: 8px; }
+.mbti-grid::-webkit-scrollbar-thumb { background: rgba(23, 60, 53, .22); border-radius: var(--pill); }
+.mbti-grid::-webkit-scrollbar-track { background: transparent; }
+.mbti-option { scroll-snap-align: start; display: grid; justify-items: center; gap: 3px; min-width: 0; padding: 10px 8px 9px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); color: var(--ink); text-align: center; transition: border-color var(--ease), background var(--ease), transform var(--ease); }
+.mbti-option:hover { border-color: var(--mbti-color); transform: translateY(-1px); }
+.mbti-option[aria-pressed="true"] { border-color: var(--mbti-color); background: var(--mbti-soft); box-shadow: inset 0 0 0 1px var(--mbti-color); }
+.mbti-option .mbti-avatar { width: 84px; height: 75px; flex: none; margin-bottom: 2px; }
+.mbti-option strong { display: block; font-size: 13px; letter-spacing: .04em; color: var(--mbti-color); }
+.mbti-option small { display: block; color: var(--muted); font-size: 11px; line-height: 1.3; }
+.persona-photo { display: block; width: 30px; height: 30px; flex: none; border-radius: 50%; object-fit: cover; object-position: 50% 20%; background: var(--stone); box-shadow: 0 0 0 1px var(--line); }
+.persona-chip { gap: 8px; padding: 4px 13px 4px 7px; }
+.persona-chip .mbti-avatar { width: 34px; height: 30px; flex: none; }
+.persona-chip .persona-photo { width: 30px; height: 30px; }
+.persona-chip > span { white-space: nowrap; }
+.heading-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.persona-badge { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 7px; border-radius: var(--pill); background: var(--mbti-soft); color: var(--ink); }
+.persona-badge .mbti-avatar { width: 34px; height: 30px; }
+.persona-badge .persona-photo { width: 30px; height: 30px; }
+.persona-badge strong { display: block; font-size: 12px; letter-spacing: .04em; line-height: 1.2; color: var(--mbti-color); }
+.persona-badge small { display: block; color: var(--muted); font-size: 10px; line-height: 1.25; }
+.settings-persona { display: flex; align-items: center; gap: 13px; width: 100%; padding-bottom: 11px; border-bottom: 1px solid var(--line); }
+.settings-persona .mbti-avatar { width: 86px; height: 77px; flex: none; }
+.settings-persona .persona-photo { width: 72px; height: 72px; }
+.settings-persona strong { display: block; font-size: 15px; }
+.settings-persona span { color: var(--muted); font-size: 13px; }
 .page-heading > .chip { flex: none; margin-bottom: 4px; }
 .skills-atlas-panel { padding: clamp(18px, 2.35vw, 29px); }
 .atlas-footnote { margin-top: 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
@@ -446,6 +493,9 @@ dialog:has(> .persona-grid) .modal-description { max-width: 48ch; }
 }
 .persona-icon { display: grid; place-items: center; width: 37px; height: 37px; flex: none; border: 1px solid var(--path-line); border-radius: 10px; background: var(--white); }
 .persona-details { display: grid; align-content: start; gap: 5px; padding: 16px 15px 14px; }
+.persona-identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.persona-identity .persona-photo { width: 48px; height: 48px; }
+.persona-identity-text { display: grid; gap: 2px; min-width: 0; }
 .persona-name { font: 800 clamp(1.1rem, 1.9vw, 1.32rem)/1.25 var(--display); letter-spacing: -.02em; }
 .persona-headline { color: var(--muted); font-size: 14px; line-height: 1.4; }
 .persona-details .chips { margin-top: 7px; }
@@ -502,6 +552,7 @@ dialog:has(> .persona-grid) .modal-description { max-width: 48ch; }
   .brand img { width: 147px; }
   .landing-nav { gap: 8px; }
   .landing-nav a { display: none; }
+  .landing-nav a.emp-entry { display: inline-flex; font-size: 12px; }
   .landing-nav .button, .header-actions .button { padding-inline: 10px; font-size: 13px; }
   .header-actions { gap: 6px; }
   .header-actions .demo-tag { display: none; }
@@ -515,6 +566,9 @@ dialog:has(> .persona-grid) .modal-description { max-width: 48ch; }
   .map-label { font-size: 8px; padding: 4px 8px; }
   .hero-figure figcaption { padding-top: 9px; font-size: 10px; }
   .mission, .features { scroll-margin-top: 69px; }
+  .tvet-band { padding-block: 22px 20px; }
+  .tvet-band-title { padding-inline: 8px; font-size: 13px; }
+  .tvet-strip { --tvet-gap: 32px; --tvet-fade: 28px; margin-top: 16px; }
   .mission-layout, .job-grid, .dashboard-grid, .skills-grid, .settings-grid, .roadmap-layout { grid-template-columns: minmax(0, 1fr); }
   .mission .lede, .features > .lede { font-size: 16px; }
   .mission-stat h3 { font-size: 15px; }
@@ -530,6 +584,11 @@ dialog:has(> .persona-grid) .modal-description { max-width: 48ch; }
   .page-heading .lede { margin-top: 7px; font-size: 16px; }
   .page-heading .eyebrow { margin-bottom: 10px; }
   .form-grid { gap: 9px; }
+  .mbti-grid { grid-auto-columns: calc((100% - 9px) / 2.15); }
+  .mbti-scroll-controls .icon-button { width: 38px; min-height: 38px; }
+  .mbti-current { padding: 10px 12px; }
+  .mbti-current .mbti-avatar { width: 72px; height: 65px; }
+  .mbti-option .mbti-avatar { width: 72px; height: 65px; }
   .evidence-control { grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr); }
   .metric-grid, .gap-metrics { gap: 8px; }
   .metric, .gap-metric { padding: 11px; border-radius: var(--radius); }

@@ -99,6 +99,36 @@ function icon(name, size = 20) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
 }
 
+function mbtiType(code) {
+  return mbtiTypes.find(type => type.code === code) || mbtiTypes[0];
+}
+
+// 16-type illustrations extracted from the supplied 16personalities chart (assets/mbti).
+function mbtiAvatar(code, size = 44) {
+  const type = mbtiType(code);
+  const height = Math.round(size * 158 / 176);
+  return `<img class="mbti-avatar" src="assets/mbti/${type.code.toLowerCase()}.png" width="${size}" height="${height}" alt="" loading="lazy" decoding="async">`;
+}
+
+// Illustrative stand-in headshots for the two demo profiles (assets/personas).
+function personaPhoto(id, size = 30) {
+  const persona = personas[id];
+  if (!persona || !persona.photo) return '';
+  return `<img class="persona-photo" src="assets/${persona.photo}" width="${size}" height="${size}" alt="" decoding="async">`;
+}
+
+function mbtiSummary(type) {
+  const group = mbtiGroups[type.group];
+  return `<div class="mbti-current" style="--mbti-color:${group.color};--mbti-soft:${group.soft}">
+    ${mbtiAvatar(type.code, 86)}
+    <div>
+      <p class="label">Selected type</p>
+      <h3>${type.code} <span>${type.name}</span></h3>
+      <p>${group.label} · ${type.tagline}</p>
+    </div>
+  </div>`;
+}
+
 function button(label, action, { style = 'primary', mark = '', value = '', attrs = '' } = {}) {
   return `<button type="button" class="button button-${style}" data-action="${action}" data-value="${escapeHTML(value)}" ${attrs}>${escapeHTML(label)}${mark ? icon(mark, 17) : ''}</button>`;
 }
@@ -194,9 +224,9 @@ function shell() {
   const links = nav.map(([id, label, mark]) => `<button type="button" class="nav-link${id === state.view ? ' selected' : ''}" data-action="go" data-value="${id}" ${id === state.view ? 'aria-current="page"' : ''}>${icon(mark, 19)}${label}</button>`).join('');
   byId('header').innerHTML = `<div class="header-inner content-width flex items-center justify-between">
     <button class="brand" type="button" data-action="go" data-value="welcome">${logo}</button>
-    ${landing ? `<nav class="landing-nav flex items-center" aria-label="Main navigation"><a href="#why-it-matters" data-action="landing-section" data-value="why-it-matters">Why it matters</a><a href="#how-it-works" data-action="landing-section" data-value="how-it-works">How it works</a>${button('Explore demo', 'persona', { style: 'plain', mark: 'external' })}</nav>` :
+    ${landing ? `<nav class="landing-nav flex items-center" aria-label="Main navigation"><a href="#why-it-matters" data-action="landing-section" data-value="why-it-matters">Why it matters</a><a href="#how-it-works" data-action="landing-section" data-value="how-it-works">How it works</a><a class="emp-entry" href="/employer">For employers</a>${button('Explore demo', 'persona', { style: 'plain', mark: 'external' })}</nav>` :
       `<div class="header-actions"><span class="demo-tag"><span class="orange-dot"></span>Demo mode</span>
-        ${button(personas[state.persona].name.split(' ')[0] + ' · Demo', 'persona', { style: 'secondary', mark: 'down' })}
+        <button type="button" class="button button-secondary persona-chip" data-action="persona" aria-label="Change demo persona">${personaPhoto(state.persona, 30)}<span>${escapeHTML(personas[state.persona].name.split(' ')[0])} · Demo</span>${icon('down', 17)}</button>
         ${workspace ? `<button class="icon-button mobile-menu" type="button" data-action="menu" aria-label="Open navigation">${icon('menu')}</button>` : ''}</div>`}
     </div>`;
   byId('shell').className = workspace ? 'shell workspace' : 'shell';
@@ -217,6 +247,18 @@ function landingView() {
   ];
   const dosm = 'https://www.dosm.gov.my/uploads/release-content/file_20260626114308.pdf';
   const oecd = 'https://www.oecd.org/en/publications/oecd-economic-surveys-malaysia-2026_9ab6b826-en/full-report/improving-skills-education-and-training_562c8471.html';
+  const tvetLogos = [
+    ['GIATMARA', 'giatmara', 185],
+    ['Politeknik Malaysia', 'politeknik-malaysia', 188],
+    ['Kolej Komuniti', 'kolej-komuniti', 170],
+    ['Institut Kemahiran MARA (IKM)', 'ikm', 196],
+    ['Institut Kemahiran Tinggi Belia Negara (IKTBN)', 'iktbn', 240],
+    ['German-Malaysian Institute (GMI)', 'gmi', 200],
+    ['TalentCorp', 'talentcorp', 168],
+    ['Developer Kaki', 'developer-kaki', 218]
+  ];
+  const tvetLogo = ([name, file, width], duplicate) => `<li class="tvet-item"${duplicate ? ' aria-hidden="true"' : ''}><img src="assets/logos/${file}.svg" alt="${duplicate ? '' : escapeHTML(name)}" width="${width}" height="48"></li>`;
+  const tvetItems = tvetLogos.map(logo => tvetLogo(logo, false)).join('') + tvetLogos.map(logo => tvetLogo(logo, true)).join('');
   return `<div class="landing">
     <section class="hero content-width grid items-center">
       <div class="hero-copy">
@@ -239,6 +281,12 @@ function landingView() {
         </div>
         <figcaption><span><b>Fig. 1A</b> · The career path</span><span>Malaysia</span></figcaption>
       </figure>
+    </section>
+    <section class="tvet-band" aria-labelledby="tvet-band-title">
+      <h2 class="tvet-band-title" id="tvet-band-title">Terokai Institusi TVET dan Komuniti Kerjaya di Malaysia.</h2>
+      <div class="tvet-strip" role="group" aria-label="Institusi TVET dan komuniti kerjaya di Malaysia">
+        <ul class="tvet-track">${tvetItems}</ul>
+      </div>
     </section>
     <section class="mission" id="why-it-matters" tabindex="-1" aria-labelledby="mission-title">
       <div class="content-width mission-layout">
@@ -302,6 +350,21 @@ function profileFields() {
       <label class="field"><span>Experience summary</span><textarea rows="3" name="experience" maxlength="900">${escapeHTML(p.experience)}</textarea></label>
       <label class="field"><span>Example projects</span><textarea rows="3" name="projects" maxlength="900">${escapeHTML(p.projects)}</textarea></label>
     </div>
+  </section>
+  <section class="panel form-panel mbti-panel">
+    <div class="mbti-head">
+      <div><h2>MBTI personality</h2><p>Pick the avatar that matches your 16-type result. Scroll sideways for all 16 — it appears in the header, dashboard and profile.</p></div>
+      <div class="mbti-scroll-controls">
+        <button type="button" class="icon-button" data-action="mbti-scroll" data-value="-1" aria-label="Scroll personality types left">${icon('back', 18)}</button>
+        <button type="button" class="icon-button" data-action="mbti-scroll" data-value="1" aria-label="Scroll personality types right">${icon('arrow', 18)}</button>
+      </div>
+    </div>
+    <div id="mbti-current">${mbtiSummary(mbtiType(p.mbti))}</div>
+    <div id="mbti-grid" class="mbti-grid" role="group" aria-label="Choose an MBTI personality type">${mbtiTypes.map(type => {
+      const group = mbtiGroups[type.group];
+      return `<button type="button" class="mbti-option" data-action="mbti" data-value="${type.code}" aria-pressed="${type.code === mbtiType(p.mbti).code}" style="--mbti-color:${group.color};--mbti-soft:${group.soft}">${mbtiAvatar(type.code, 76)}<span><strong>${type.code}</strong><small>${type.name}</small></span></button>`;
+    }).join('')}</div>
+    ${notice('Self-reported for this demo. The 16-type framework is a reflection prompt, not a career assessment.')}
   </section>
   <section class="panel form-panel">
     <h2>Career preferences</h2>
@@ -480,6 +543,8 @@ function miniCourse(course) {
 function dashboardView() {
   const best = rankedJobs()[0];
   const job = targetJob();
+  const type = mbtiType(profile().mbti);
+  const group = mbtiGroups[type.group];
   const known = skills.filter(skill => score(skill.id) > 0).sort((a, b) => score(b.id) - score(a.id));
   const focus = gapsFor(job).filter(item => item.gap).slice(0, 3);
   const recs = rankedCourses(job || best).filter(item => item.relevance).slice(0, 2);
@@ -491,7 +556,7 @@ function dashboardView() {
     ['route', 'Roadmap completion', progress.percent + '%', 'roadmap', `${progress.done} of ${progress.total} tasks complete`]
   ];
   return `
-    ${title('Overview', 'Hi ' + escapeHTML(profile().name.trim().split(/\s+/)[0]) + ', here is your career overview', 'Your sample skills, the closest career matches and the next steps in your plan.', goButton('Explore Careers', 'careers'))}
+    ${title('Overview', 'Hi ' + escapeHTML(profile().name.trim().split(/\s+/)[0]) + ', here is your career overview', 'Your sample skills, the closest career matches and the next steps in your plan.', `<div class="heading-actions"><span class="persona-badge" style="--mbti-soft:${group.soft};--mbti-color:${group.color}" title="MBTI personality: ${type.code} · ${type.name}">${personaPhoto(state.persona, 30)}<span><strong>${type.code}</strong><small>${type.name}</small></span></span>${goButton('Explore Careers', 'careers')}</div>`)}
     <section class="metric-grid" aria-label="Career summary">${metrics.map(([mark, label, value, view, note]) => `<button type="button" class="panel metric" data-action="go" data-value="${view}"><span class="metric-label"><span class="tile-icon">${icon(mark, 17)}</span>${label}</span><strong>${value}</strong><span>${note}</span></button>`).join('')}</section>
     <div class="dashboard-grid">
       <section class="panel dashboard-panel"><div class="section-head"><h2>Your Skills at a Glance</h2>${goButton('All skills', 'skills', 'plain')}</div>${known.length ? evidenceBars(known.slice(0, 6)) : '<p>Enter evidence in your profile to see your strongest sample skills here.</p>'}</section>
@@ -781,12 +846,14 @@ function atlasView() {
 }
 
 function settingsView() {
+  const type = mbtiType(profile().mbti);
   return `${title('My profile', 'Your profile and preferences', 'Edit the sample details that shape your career matches and learning plan.', button('Change Demo Persona', 'persona', { style: 'secondary', mark: 'down' }))}
     <div class="settings-grid">
       <form id="profile-form">${profileFields()}<button type="submit" class="button button-primary">Save Changes${icon('check', 17)}</button></form>
       <aside class="panel dashboard-panel settings-info">
+        <div class="settings-persona">${personaPhoto(state.persona, 72)}<div><strong>${escapeHTML(profile().name)}</strong><span>${type.code} · ${type.name}</span></div></div>
         <h2>Demo settings</h2>
-        <dl><dt>Sample persona</dt><dd>${personas[state.persona].name}</dd><dt>Target career</dt><dd>${targetJob()?.title || 'Choose a career in Career Explorer'}</dd><dt>Selected resume</dt><dd>${state.file ? escapeHTML(state.file.name) + ' · This session only' : 'Using a sample profile'}</dd></dl>
+        <dl><dt>Sample persona</dt><dd>${personas[state.persona].name}</dd><dt>MBTI personality</dt><dd>${type.code} · ${type.name} (${mbtiGroups[type.group].label})</dd><dt>Target career</dt><dd>${targetJob()?.title || 'Choose a career in Career Explorer'}</dd><dt>Selected resume</dt><dd>${state.file ? escapeHTML(state.file.name) + ' · This session only' : 'Using a sample profile'}</dd></dl>
         ${notice('This browser can save demo preferences, target careers and roadmap tasks. File details, editable profile text and evidence scores stay in the current session.', 'lock')}
         ${goButton('How scores work', 'skills', 'plain', 'info')}
         ${goButton('Upload New Resume', 'upload', 'plain', 'upload')}
@@ -824,9 +891,8 @@ function personaPicker() {
       return `<button type="button" class="persona-card persona-${id}" data-action="choose-persona" data-value="${id}">
         <span class="persona-path"><span class="persona-icon">${icon(path.mark, 21)}</span><span>${path.label}</span></span>
         <span class="persona-details">
-          <strong class="persona-name">${persona.name}</strong>
-          <span class="persona-headline">${persona.headline}</span>
-          <span class="chips">${path.skills.map(skill => chip(skillName(skill))).join('')}</span>
+          <span class="persona-identity">${personaPhoto(id, 48)}<span class="persona-identity-text"><strong class="persona-name">${persona.name}</strong><span class="persona-headline">${persona.headline}</span></span></span>
+          <span class="chips">${path.skills.map(skill => chip(skillName(skill))).join('')}${chip(persona.mbti + ' · ' + mbtiType(persona.mbti).name)}</span>
         </span>
         <span class="persona-footer">
           <span class="persona-location">${icon('pin', 15)}${persona.location}</span>
@@ -964,6 +1030,7 @@ function saveProfile(form) {
   const preferences = Object.fromEntries(['location', 'budget', 'mode'].map(name => [name, input.get(name)]));
   preferences.hours = Number(input.get('hours'));
   preferences.interests = input.getAll('interests');
+  preferences.mbti = profile().mbti;
   const info = Object.fromEntries(['name', 'qualification', 'field', 'experience', 'projects'].map(name => [name, input.get(name).trim()]));
   if (!info.name) {
     const nameField = form.elements.namedItem('name');
@@ -1055,6 +1122,22 @@ const actions = {
     main.querySelector('[data-action="skill-category"][aria-pressed="true"]').focus({ preventScroll: true });
   },
   'radar-skill': selectRadarSkill,
+  'mbti-scroll'(direction) {
+    const grid = byId('mbti-grid');
+    if (!grid) return;
+    grid.scrollBy({ left: Number(direction) * Math.max(190, grid.clientWidth * .8), behavior: 'smooth' });
+  },
+  mbti(code) {
+    const type = mbtiTypes.find(item => item.code === code);
+    if (!type) return;
+    profile().mbti = code;
+    const current = byId('mbti-current');
+    if (current) current.innerHTML = mbtiSummary(type);
+    main.querySelectorAll('.mbti-option').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.value === code)));
+    main.querySelector(`.mbti-option[data-value="${code}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    shell();
+    notify(type.code + ' · ' + type.name + ' selected.');
+  },
   'clear-careers'() {
     state.careerSearch = '';
     state.careerCategory = 'All';
