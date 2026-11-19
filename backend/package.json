@@ -1,0 +1,22 @@
+{
+  "name": "jomworklah-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Jom Kerja Lah backend — skills-to-career navigator API",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "db:migrate": "node --env-file-if-exists=.env scripts/db-migrate.js",
+    "db:seed": "node --env-file-if-exists=.env scripts/db-seed.js",
+    "db:reset": "node --env-file-if-exists=.env scripts/db-reset.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "zod": "^3.23.8"
+  }
+}

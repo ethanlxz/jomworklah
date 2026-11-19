@@ -1,0 +1,56 @@
+import { once } from 'node:events';
+import { createAiAdapter } from '../src/ai/index.js';
+import { createApp } from '../src/app.js';
+import { loadConfig } from '../src/config.js';
+import { closeDatabase, openDatabase } from '../src/db/connection.js';
+import { migrate } from '../src/db/migrate.js';
+import { seed } from '../src/db/seed.js';
+
+export async function makeTestApp(overrides = {}) {
+  const db = openDatabase(':memory:');
+  migrate(db);
+  seed(db);
+
+  const config = {
+    ...loadConfig({}),
+    nodeEnv: 'test',
+    staticDir: null,
+    rateLimit: { enabled: false, perMinute: 120 },
+    ...overrides
+  };
+
+  const app = createApp({ db, config, ai: createAiAdapter(config) });
+  const server = app.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  const { port } = server.address();
+
+  return {
+    db,
+    app,
+    config,
+    base: `http://127.0.0.1:${port}`,
+    async close() {
+      await new Promise(resolve => server.close(resolve));
+      closeDatabase(db);
+    }
+  };
+}
+
+export async function api(base, method, path, { token, body } = {}) {
+  const headers = {};
+  if (body !== undefined) headers['content-type'] = 'application/json';
+  if (token) headers.authorization = `Bearer ${token}`;
+  const response = await fetch(`${base}${path}`, {
+    method,
+    headers,
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
+  const text = await response.text();
+  return { status: response.status, body: text ? JSON.parse(text) : null };
+}
+
+export async function demoToken(base, personaKey = 'aina') {
+  const result = await api(base, 'POST', '/api/demo/session', { body: { personaKey } });
+  if (result.status !== 201) throw new Error(`demo session failed: ${JSON.stringify(result.body)}`);
+  return result.body.data.token;
+}
