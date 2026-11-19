@@ -46,6 +46,16 @@ export const assessmentSchema = z.object({
   narrative: z.string().trim().min(1, 'Narrative is required').max(5000)
 });
 
+const boolQuery = z
+  .enum(['1', 'true', 'yes', 'on', '0', 'false', 'no', 'off'])
+  .default('true')
+  .transform(value => ['1', 'true', 'yes', 'on'].includes(value));
+
+export const parseResumeQuerySchema = z.object({
+  mode: z.enum(['auto', 'live', 'simulate']).optional().default('auto'),
+  persist: boolQuery
+});
+
 export const explainMatchSchema = z.object({
   jobId: z.string().min(1).max(120)
 });

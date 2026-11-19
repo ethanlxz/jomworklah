@@ -1,0 +1,85 @@
+import { QwenDocError } from '../ai/qwen-doc.js';
+import { extractedResumeSchema, isEmptyResume, normalizeExtraction, resumeExtractionPrompt } from '../ai/resume-extract.js';
+import { sampleResume } from '../ai/resume-sample.js';
+import { mapResumeToProfile, mapResumeToSkills } from '../domain/resume-mapping.js';
+import { AppError } from '../middleware/errors.js';
+import { loadSkillList } from './catalogue.js';
+import { getProfile, getSkills, setSkills, updateProfile } from './profile-service.js';
+
+function validateExtraction(raw) {
+  const result = extractedResumeSchema.safeParse(normalizeExtraction(raw));
+  if (!result.success) {
+    const details = result.error.issues.map(issue => ({ path: issue.path.join('.'), message: issue.message }));
+    throw new AppError(502, 'INVALID_EXTRACTION', 'The extraction result did not match the resume structure.', details);
+  }
+  return result.data;
+}
+
+function providerError(error) {
+  if (error instanceof AppError) throw error;
+  if (error instanceof QwenDocError) {
+    if (error.reason === 'document') return new AppError(400, 'INVALID_DOCUMENT', error.message);
+    if (error.reason === 'busy') return new AppError(503, 'AI_PROVIDER_BUSY', error.message);
+    return new AppError(502, 'RESUME_EXTRACTION_FAILED', error.message);
+  }
+  return new AppError(502, 'RESUME_EXTRACTION_FAILED', `Resume extraction failed: ${String(error?.message ?? error).slice(0, 200)}`);
+}
+
+/**
+ * Upload, read and delete are bounded here so the Qwen document is always
+ * cleaned up, even when extraction or validation fails halfway through.
+ */
+async function extractWithQwen(qwen, file) {
+  let fileId = null;
+  try {
+    fileId = (await qwen.upload({ ...file })).id;
+    await qwen.waitForProcessing(fileId);
+    return validateExtraction(await qwen.extract({ fileId, prompt: resumeExtractionPrompt }));
+  } catch (error) {
+    throw providerError(error);
+  } finally {
+    if (fileId) await qwen.remove(fileId);
+  }
+}
+
+function applyExtraction(db, userId, resume, persist) {
+  const profilePatch = mapResumeToProfile(resume);
+  const mapping = mapResumeToSkills(resume, loadSkillList(db));
+
+  const profile = persist && Object.keys(profilePatch).length
+    ? updateProfile(db, userId, profilePatch)
+    : getProfile(db, userId);
+  const skills = persist && Object.keys(mapping.scores).length
+    ? setSkills(db, userId, mapping.scores)
+    : getSkills(db, userId);
+
+  return {
+    persisted: Boolean(persist),
+    updatedProfileFields: Object.keys(profilePatch),
+    matchedSkills: mapping.matched,
+    unmatchedSkills: mapping.unmatched,
+    profile,
+    skills
+  };
+}
+
+export async function parseResume({ db, qwen, userId, file, mode = 'auto', persist = true }) {
+  const simulated = mode === 'simulate' || (mode === 'auto' && !qwen);
+  if (!simulated && !qwen) {
+    throw new AppError(503, 'AI_NOT_CONFIGURED', 'Live resume parsing needs DASHSCOPE_API_KEY. Set it or use ?mode=simulate.');
+  }
+
+  const resume = simulated ? validateExtraction(sampleResume()) : await extractWithQwen(qwen, file);
+  if (isEmptyResume(resume)) {
+    throw new AppError(400, 'INVALID_DOCUMENT', 'No resume details could be read from this document.');
+  }
+
+  return {
+    file: { name: file.filename, size: file.size, mimetype: file.mimetype },
+    provider: simulated ? 'simulated' : 'qwen',
+    model: simulated ? null : qwen.model,
+    is_simulated: simulated,
+    resume,
+    saved: applyExtraction(db, userId, resume, persist)
+  };
+}

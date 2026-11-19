@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import express, { Router } from 'express';
 import { createAiAdapter } from './ai/index.js';
+import { createQwenDocClient } from './ai/qwen-doc.js';
 import { requireAuth } from './middleware/auth.js';
 import { errorHandler, AppError } from './middleware/errors.js';
 import { notFound } from './middleware/not-found.js';
@@ -14,6 +15,7 @@ import { careersRouter } from './routes/careers.js';
 import { trainingRouter } from './routes/training.js';
 import { roadmapRouter } from './routes/roadmap.js';
 import { aiRouter } from './routes/ai.js';
+import { parseResumeRouter } from './routes/parse-resume.js';
 
 function cors(config) {
   const allowed = String(config.frontendOrigin || '').split(',').map(origin => origin.trim()).filter(Boolean);
@@ -49,11 +51,17 @@ function rateLimiter({ perMinute }) {
   };
 }
 
-export function createApp({ db, config, ai = createAiAdapter(config) }) {
+export function createApp({
+  db,
+  config,
+  ai = createAiAdapter(config),
+  qwen = config.qwen.apiKey ? createQwenDocClient(config.qwen) : null
+}) {
   const app = express();
   app.locals.db = db;
   app.locals.config = config;
   app.locals.ai = ai;
+  app.locals.qwen = qwen;
 
   app.disable('x-powered-by');
   app.use((req, _res, next) => {
@@ -87,6 +95,7 @@ export function createApp({ db, config, ai = createAiAdapter(config) }) {
   protectedRouter.use(trainingRouter());
   protectedRouter.use(roadmapRouter());
   protectedRouter.use(aiRouter());
+  protectedRouter.use(parseResumeRouter(config));
   app.use('/api', protectedRouter);
 
   if (config.staticDir && fs.existsSync(config.staticDir)) {

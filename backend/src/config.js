@@ -29,6 +29,15 @@ export function loadConfig(env = process.env) {
       model: env.AI_MODEL || '',
       timeoutMs: toInt(env.AI_TIMEOUT_MS, 8000)
     },
+    qwen: {
+      apiKey: env.DASHSCOPE_API_KEY || '',
+      baseUrl: env.QWEN_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      model: env.QWEN_MODEL || 'qwen-doc-turbo',
+      timeoutMs: toInt(env.QWEN_TIMEOUT_MS, 60000)
+    },
+    resume: {
+      maxFileBytes: toInt(env.RESUME_MAX_BYTES, 10 * 1024 * 1024)
+    },
     allowDevReset: toBool(env.ALLOW_DEV_RESET, false),
     rateLimit: {
       enabled: toBool(env.RATE_LIMIT, false),
