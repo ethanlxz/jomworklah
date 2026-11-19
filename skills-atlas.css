@@ -3,23 +3,23 @@
    never leaks into, or inherits from, the host application's components. */
 
 .skills-atlas {
-  --atlas-bg: #fafaf9;
-  --atlas-surface: #ffffff;
-  --atlas-surface2: #f5f5f4;
-  --atlas-line: rgba(28, 25, 23, .14);
-  --atlas-line-soft: rgba(28, 25, 23, .07);
-  --atlas-ink: #1c1917;
-  --atlas-dim: #625c57;
-  --atlas-faint: #78716c;
-  --atlas-supply: #0f766e;
-  --atlas-supply-lo: #ccfbf1;
-  --atlas-demand: #b45309;
-  --atlas-demand-lo: #fef3c7;
-  --atlas-pos: #b42318;
-  --atlas-neg: #1d4ed8;
-  --atlas-neutral: #d6d3d1;
-  --atlas-sea: #e9e7e1;
-  --atlas-shadow: 0 14px 34px rgba(28, 25, 23, .10);
+  --atlas-bg: #f5f3ec;
+  --atlas-surface: #fbfaf5;
+  --atlas-surface2: #efebe1;
+  --atlas-line: rgba(23, 60, 53, .14);
+  --atlas-line-soft: rgba(23, 60, 53, .07);
+  --atlas-ink: #173c35;
+  --atlas-dim: #58716c;
+  --atlas-faint: #7c8a85;
+  --atlas-supply: #087a63;
+  --atlas-supply-lo: #d9f0e8;
+  --atlas-demand: #b4530b;
+  --atlas-demand-lo: #fbe9d9;
+  --atlas-pos: #c9431f;
+  --atlas-neg: #1f5fbf;
+  --atlas-neutral: #dcd7c9;
+  --atlas-sea: #e9e5d7;
+  --atlas-shadow: 0 10px 26px rgba(23, 60, 53, .12);
   color: var(--atlas-ink);
   font-family: var(--sans);
   font-size: 14px;
@@ -33,10 +33,10 @@
 
 /* ---- mode + view controls ---- */
 .skills-atlas .atlas-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 13px; }
-.skills-atlas .atlas-modes { display: flex; gap: 6px; background: var(--atlas-surface); border: 1px solid var(--atlas-line); border-radius: 14px; padding: 6px; flex: 1 1 430px; max-width: 620px; }
+.skills-atlas .atlas-modes { display: flex; gap: 6px; background: var(--atlas-surface); border: 1px solid var(--atlas-line); border-radius: var(--pill, 9999px); padding: 6px; flex: 1 1 430px; max-width: 620px; }
 .skills-atlas .mode {
   flex: 1; min-width: 0; border: 0; background: transparent; color: var(--atlas-dim);
-  border-radius: 9px; padding: 10px; font-weight: 600; font-size: 13.5px;
+  border-radius: var(--pill, 9999px); padding: 10px; font-weight: 700; font-size: 13.5px;
   display: flex; flex-direction: column; gap: 2px; align-items: flex-start;
   transition: background .18s, color .18s, box-shadow .18s;
 }
@@ -46,18 +46,18 @@
 .skills-atlas .mode[data-mode="skills"][aria-pressed="true"] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--atlas-supply) 55%, var(--atlas-line)); }
 .skills-atlas .mode[data-mode="industry"][aria-pressed="true"] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--atlas-demand) 55%, var(--atlas-line)); }
 .skills-atlas .mode[data-mode="overlay"][aria-pressed="true"] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--atlas-pos) 55%, var(--atlas-line)); }
-.skills-atlas .atlas-viewtoggle { display: flex; gap: 4px; background: var(--atlas-surface); border: 1px solid var(--atlas-line); border-radius: 11px; padding: 4px; }
-.skills-atlas .vt { border: 0; background: transparent; color: var(--atlas-dim); border-radius: 8px; padding: 8px 14px; font-weight: 600; font-size: 13px; transition: background .18s, color .18s; }
+.skills-atlas .atlas-viewtoggle { display: flex; gap: 4px; background: var(--atlas-surface); border: 1px solid var(--atlas-line); border-radius: var(--pill, 9999px); padding: 4px; }
+.skills-atlas .vt { border: 0; background: transparent; color: var(--atlas-dim); border-radius: var(--pill, 9999px); padding: 8px 14px; font-weight: 700; font-size: 13px; transition: background .18s, color .18s; }
 .skills-atlas .vt[aria-pressed="true"] { background: var(--atlas-surface2); color: var(--atlas-ink); box-shadow: inset 0 0 0 1px var(--atlas-line); }
 .skills-atlas .vt:hover { color: var(--atlas-ink); }
 
 /* ---- toolbar ---- */
 .skills-atlas .atlas-toolbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; justify-content: space-between; margin: 0 0 14px; }
 .skills-atlas .atlas-field { display: flex; flex-direction: column; gap: 5px; }
-.skills-atlas .atlas-field > span { font-size: 11.5px; color: var(--atlas-faint); font-weight: 600; padding-left: 2px; }
+.skills-atlas .atlas-field > span { font-size: 11.5px; color: var(--atlas-faint); font-weight: 700; padding-left: 2px; }
 .skills-atlas .atlas-field select {
   background: var(--atlas-surface); border: 1px solid var(--atlas-line); color: var(--atlas-ink);
-  border-radius: 11px; padding: 10px 34px 10px 12px; min-width: 230px; font-size: 14px;
+  border-radius: var(--pill, 9999px); padding: 10px 34px 10px 16px; min-width: 230px; font-size: 14px; font-weight: 600;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%2378716c' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 12px center;
@@ -73,12 +73,12 @@
 /* ---- layout cards ---- */
 .skills-atlas .atlas-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
 .skills-atlas .atlas-mapcard,
-.skills-atlas .atlas-sidecard { background: var(--atlas-surface); border: 1px solid var(--atlas-line); border-radius: 18px; box-shadow: 0 4px 16px rgba(28, 25, 23, .03); min-width: 0; }
+.skills-atlas .atlas-sidecard { background: var(--atlas-surface); border: 1px solid var(--atlas-line); border-radius: var(--radius, 3px); box-shadow: none; min-width: 0; }
 .skills-atlas .atlas-mapcard { position: relative; overflow: hidden; padding: 10px; }
 .skills-atlas .atlas-sidecard { padding: 18px; }
 
 /* ---- 2D map ---- */
-.skills-atlas .atlas-map { display: block; width: 100%; height: auto; border-radius: 12px; background: var(--atlas-sea); }
+.skills-atlas .atlas-map { display: block; width: 100%; height: auto; border-radius: var(--radius, 3px); background: var(--atlas-sea); }
 .skills-atlas .sea { fill: var(--atlas-sea); }
 .skills-atlas .searegion { fill: var(--atlas-faint); opacity: .55; font: 600 11px var(--sans); letter-spacing: .06em; }
 .skills-atlas .state { stroke: var(--atlas-line); stroke-width: .8; cursor: pointer; transition: fill .18s, opacity .18s, stroke .15s; }
@@ -98,9 +98,9 @@
 .skills-atlas .atlas-crumb {
   position: absolute; top: 16px; left: 16px; display: flex; align-items: center; gap: 8px;
   background: color-mix(in srgb, var(--atlas-surface) 90%, transparent); backdrop-filter: blur(6px);
-  border: 1px solid var(--atlas-line); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; z-index: 3;
+  border: 1px solid var(--atlas-line); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 700; z-index: 3;
 }
-.skills-atlas .crumb-home { border: 0; background: none; padding: 0; color: var(--atlas-dim); font-weight: 600; }
+.skills-atlas .crumb-home { border: 0; background: none; padding: 0; color: var(--atlas-dim); font-weight: 700; }
 .skills-atlas .crumb-home:hover { color: var(--atlas-ink); }
 .skills-atlas .atlas-crumb .sep { color: var(--atlas-faint); }
 .skills-atlas .atlas-crumb .cur { color: var(--atlas-ink); }
@@ -108,58 +108,58 @@
 /* ---- legend ---- */
 .skills-atlas .atlas-legend {
   margin: 10px 2px 2px; background: var(--atlas-surface2); border: 1px solid var(--atlas-line-soft);
-  border-radius: 12px; padding: 10px 14px; font-size: 12px; color: var(--atlas-dim);
+  border-radius: var(--radius, 3px); padding: 10px 14px; font-size: 12px; color: var(--atlas-dim);
   display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center;
 }
 .skills-atlas .atlas-legend:empty { display: none; }
-.skills-atlas .ltitle { color: var(--atlas-ink); font-weight: 600; font-size: 12.5px; }
-.skills-atlas .lbar { height: 9px; border-radius: 5px; width: 170px; }
+.skills-atlas .ltitle { color: var(--atlas-ink); font-weight: 700; font-size: 12.5px; }
+.skills-atlas .lbar { height: 9px; border-radius: var(--pill, 9999px); width: 170px; }
 .skills-atlas .lrow { display: flex; gap: 10px; font-size: 10.5px; color: var(--atlas-faint); }
 .skills-atlas .lhint { flex-basis: 100%; font-size: 11px; line-height: 1.35; color: var(--atlas-faint); margin: 0; }
 .skills-atlas .litem { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; }
-.skills-atlas .litem i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.skills-atlas .litem i { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
 
 /* ---- 3D view ---- */
 .skills-atlas .atlas-stage3d { position: relative; }
-.skills-atlas .atlas-scene3d { width: 100%; height: clamp(440px, 58vh, 660px); border-radius: 12px; overflow: hidden; cursor: grab; background: var(--atlas-sea); }
-.skills-atlas .atlas-scene3d canvas { display: block; border-radius: 12px; }
+.skills-atlas .atlas-scene3d { width: 100%; height: clamp(440px, 58vh, 660px); border-radius: 8px; overflow: hidden; cursor: grab; background: var(--atlas-sea); }
+.skills-atlas .atlas-scene3d canvas { display: block; border-radius: 8px; }
 .skills-atlas .atlas-reset {
   position: absolute; top: 14px; right: 14px; z-index: 2; display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 12px; border-radius: 10px; border: 1px solid var(--atlas-line);
+  padding: 8px 14px; border-radius: var(--pill, 9999px); border: 1px solid var(--atlas-line);
   background: color-mix(in srgb, var(--atlas-surface) 90%, transparent); backdrop-filter: blur(6px);
-  color: var(--atlas-ink); font-size: 12.5px; font-weight: 600; box-shadow: 0 4px 14px rgba(28, 25, 23, .08);
+  color: var(--atlas-ink); font-size: 12.5px; font-weight: 700; box-shadow: 0 4px 14px rgba(23, 60, 53, .1);
 }
 .skills-atlas .atlas-reset:hover { border-color: var(--orange-ink); color: var(--orange-ink); }
 .skills-atlas .atlas-hud3d {
   position: absolute; bottom: 14px; right: 14px; max-width: min(72%, 340px);
   background: color-mix(in srgb, var(--atlas-surface) 88%, transparent); backdrop-filter: blur(6px);
-  border: 1px solid var(--atlas-line); border-radius: 10px; padding: 7px 11px;
+  border: 1px solid var(--atlas-line); border-radius: 8px; padding: 7px 11px;
   font-size: 12px; font-weight: 600; color: var(--atlas-dim); pointer-events: none;
 }
 .skills-atlas .atlas-hud3d b { color: var(--atlas-ink); }
 .skills-atlas .hud-note { font-weight: 500; font-size: 11px; }
 .skills-atlas .atlas-3d-msg {
   position: absolute; inset: auto 16px 16px; max-width: 460px; padding: 12px 14px;
-  border: 1px solid var(--atlas-line); border-radius: 12px; background: var(--atlas-surface);
+  border: 1px solid var(--atlas-line); border-radius: 8px; background: var(--atlas-surface);
   color: var(--atlas-dim); font-size: 13px; line-height: 1.5; box-shadow: var(--atlas-shadow);
 }
 
 /* ---- contextual sidebar ---- */
-.skills-atlas .sb-head h2 { font: 400 1.4rem/1.1 var(--display); letter-spacing: -.01em; margin: 0 0 2px; color: var(--atlas-ink); }
+.skills-atlas .sb-head h2 { font: 800 1.15rem/1.2 var(--display); letter-spacing: -.02em; margin: 0 0 2px; color: var(--atlas-ink); }
 .skills-atlas .sb-head .sub { color: var(--atlas-faint); font-size: 12.5px; margin: 0 0 12px; }
 .skills-atlas .sb-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; margin: 6px 0 4px; }
 .skills-atlas .pie-wrap { width: 120px; }
 .skills-atlas .pie-wrap svg { width: 100%; height: auto; }
 .skills-atlas .pie-legend { display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 8px; }
 .skills-atlas .pie-legend span { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--atlas-dim); }
-.skills-atlas .pie-legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
-.skills-atlas .sb-sub { color: var(--atlas-faint); font-size: 11.5px; margin: 14px 0 4px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.skills-atlas .pie-legend i { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+.skills-atlas .sb-sub { color: var(--atlas-teal, var(--atlas-supply)); font-size: 11.5px; margin: 14px 0 4px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
 .skills-atlas .sb-sub.first { margin-top: 0; }
 .skills-atlas .sb-list { margin-top: 2px; }
 .skills-atlas .sb-row { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--atlas-line-soft); font-size: 13px; }
 .skills-atlas .sb-row:last-child { border-bottom: 0; }
 .skills-atlas .sb-row .n { color: var(--atlas-ink); }
-.skills-atlas .sb-row .v { color: var(--atlas-dim); font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.skills-atlas .sb-row .v { color: var(--atlas-dim); font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
 .skills-atlas .sb-total { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 700; margin-top: 10px; color: var(--atlas-ink); }
 .skills-atlas .disc { color: var(--atlas-faint); font-size: 11px; margin-top: 14px; line-height: 1.4; }
 .skills-atlas .sb-scroll { max-height: 300px; overflow: auto; margin-top: 2px; padding-right: 4px; }
@@ -167,17 +167,17 @@
 .skills-atlas .sb-row2:last-child { border-bottom: 0; }
 .skills-atlas .sb-row2 .n { color: var(--atlas-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .skills-atlas .sb-row2 .sec { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
-.skills-atlas .sb-row2 .v { color: var(--atlas-dim); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 52px; text-align: right; }
+.skills-atlas .sb-row2 .v { color: var(--atlas-dim); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 52px; text-align: right; }
 
 .skills-atlas .stat3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-bottom: 12px; }
-.skills-atlas .stat { background: var(--atlas-surface2); border: 1px solid var(--atlas-line-soft); border-radius: 12px; padding: 11px 10px; }
-.skills-atlas .stat .k { font-size: 11px; color: var(--atlas-faint); font-weight: 600; }
-.skills-atlas .stat .v { font: 400 1.45rem/1.1 var(--display); margin-top: 3px; }
+.skills-atlas .stat { background: var(--atlas-surface2); border: 1px solid var(--atlas-line-soft); border-radius: var(--radius, 3px); padding: 11px 12px; }
+.skills-atlas .stat .k { font-size: 11px; color: var(--atlas-faint); font-weight: 700; }
+.skills-atlas .stat .v { font: 800 1.25rem/1.15 var(--display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-top: 3px; }
 .skills-atlas .v.supply { color: var(--atlas-supply); }
 .skills-atlas .v.demand { color: var(--atlas-demand); }
 .skills-atlas .v.pos { color: var(--atlas-pos); }
 .skills-atlas .v.neg { color: var(--atlas-neg); }
-.skills-atlas .verdict { border-radius: 12px; padding: 12px 13px; font-size: 13px; line-height: 1.45; border: 1px solid var(--atlas-line-soft); background: var(--atlas-surface2); color: var(--atlas-dim); }
+.skills-atlas .verdict { border-radius: var(--radius, 3px); padding: 12px 13px; font-size: 13px; line-height: 1.45; border: 1px solid var(--atlas-line-soft); background: var(--atlas-surface2); color: var(--atlas-dim); }
 .skills-atlas .verdict b { color: var(--atlas-ink); }
 .skills-atlas .verdict.op { border-color: color-mix(in srgb, var(--atlas-pos) 40%, var(--atlas-line)); background: color-mix(in srgb, var(--atlas-pos) 7%, var(--atlas-surface2)); }
 .skills-atlas .verdict.ov { border-color: color-mix(in srgb, var(--atlas-neg) 40%, var(--atlas-line)); background: color-mix(in srgb, var(--atlas-neg) 7%, var(--atlas-surface2)); }
@@ -185,39 +185,39 @@
 .skills-atlas .tvet b { color: var(--atlas-ink); }
 .skills-atlas .drillbtn {
   margin-top: 14px; width: 100%; max-width: 640px; border: 1px solid color-mix(in srgb, var(--orange-ink) 35%, var(--atlas-line));
-  background: var(--accent-light); color: var(--orange-ink); border-radius: 11px; padding: 11px;
-  font-weight: 600; font-size: 13.5px;
+  background: var(--accent-light); color: var(--orange-ink); border-radius: var(--pill, 9999px); padding: 12px;
+  font-weight: 800; font-size: 13.5px;
 }
 .skills-atlas .drillbtn:hover { border-color: var(--orange-ink); }
 
 .skills-atlas .gapbars { margin-top: 4px; max-width: 640px; }
 .skills-atlas .gapbar { margin: 10px 0; }
 .skills-atlas .gapbar .lab { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--atlas-dim); margin-bottom: 4px; }
-.skills-atlas .gapbar .tr { height: 13px; border-radius: 7px; background: var(--atlas-surface2); overflow: hidden; }
-.skills-atlas .gapbar .fl { height: 100%; border-radius: 7px; }
+.skills-atlas .gapbar .tr { height: 13px; border-radius: var(--pill, 9999px); background: var(--atlas-surface2); overflow: hidden; }
+.skills-atlas .gapbar .fl { height: 100%; border-radius: var(--pill, 9999px); }
 .skills-atlas .ps-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(80px, 1.2fr) 38px; gap: 10px; align-items: center; padding: 5px 0; font-size: 12.5px; }
 .skills-atlas .ps-row .nm { color: var(--atlas-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.skills-atlas .ps-row .v { color: var(--atlas-ink); font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
-.skills-atlas .track { position: relative; height: 10px; background: var(--atlas-surface2); border-radius: 6px; overflow: hidden; }
+.skills-atlas .ps-row .v { color: var(--atlas-ink); font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.skills-atlas .track { position: relative; height: 10px; background: var(--atlas-surface2); border-radius: var(--pill, 9999px); overflow: hidden; }
 .skills-atlas .div-mid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--atlas-line); z-index: 1; }
-.skills-atlas .fill { position: absolute; top: 0; bottom: 0; border-radius: 6px; }
+.skills-atlas .fill { position: absolute; top: 0; bottom: 0; border-radius: var(--pill, 9999px); }
 
 /* ---- hover tooltip ---- */
 .skills-atlas .atlas-tip {
   position: fixed; z-index: 80; pointer-events: none; min-width: 150px; max-width: 250px;
-  background: var(--atlas-surface); border: 1px solid var(--atlas-line); border-radius: 10px;
-  padding: 8px 11px; font-size: 12.5px; color: var(--atlas-ink); box-shadow: var(--atlas-shadow);
+  background: var(--atlas-surface); border: 1px solid var(--atlas-line); border-radius: 8px;
+  padding: 9px 12px; font-size: 12.5px; color: var(--atlas-ink); box-shadow: var(--atlas-shadow);
 }
 .skills-atlas .atlas-tip .tn { font-weight: 700; margin-bottom: 2px; }
 .skills-atlas .atlas-tip .tsub { color: var(--atlas-faint); font-size: 10.5px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
-.skills-atlas .atlas-tip .tv { font: 500 1.6rem/1 var(--display); }
+.skills-atlas .atlas-tip .tv { font: 800 1.45rem/1 var(--display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .skills-atlas .atlas-tip .tl { color: var(--atlas-dim); font-size: 11.5px; margin-top: 3px; }
-.skills-atlas .atlas-tip .tbar { display: flex; height: 9px; border-radius: 5px; overflow: hidden; margin: 2px 0 8px; width: 195px; }
+.skills-atlas .atlas-tip .tbar { display: flex; height: 9px; border-radius: var(--pill, 9999px); overflow: hidden; margin: 2px 0 8px; width: 195px; }
 .skills-atlas .atlas-tip .tbar span { display: block; height: 100%; }
 .skills-atlas .atlas-tip .trow { display: grid; grid-template-columns: 11px minmax(0, 1fr) auto; gap: 7px; align-items: center; font-size: 11.5px; padding: 2px 0; }
-.skills-atlas .atlas-tip .trow .d { width: 9px; height: 9px; border-radius: 2px; }
+.skills-atlas .atlas-tip .trow .d { width: 9px; height: 9px; border-radius: 999px; }
 .skills-atlas .atlas-tip .trow .nn { color: var(--atlas-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.skills-atlas .atlas-tip .trow .vv { color: var(--atlas-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.skills-atlas .atlas-tip .trow .vv { color: var(--atlas-ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* ---- responsive ---- */
 @media (min-width: 960px) {

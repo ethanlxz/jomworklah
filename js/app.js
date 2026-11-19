@@ -244,7 +244,7 @@ function landingView() {
       <div class="content-width mission-layout">
         <div>
           <p class="label">Our mission</p>
-          <h2 id="mission-title">A clearer path <em>from education to work.</em></h2>
+          <h2 id="mission-title">Youth unemployment and skills mismatch in Malaysia</h2>
           <p class="lede">JomWorkLah helps Malaysian students, fresh graduates and young jobseekers connect what they know with career opportunities and practical training.</p>
         </div>
         <div class="mission-evidence">
@@ -262,8 +262,8 @@ function landingView() {
     </section>
     <section class="features content-width" id="how-it-works" tabindex="-1" aria-labelledby="features-title">
       <p class="label">How it works</p>
-      <h2 id="features-title">From what you know to <em>what’s next.</em></h2>
-      <p class="lede">The demo uses sample profiles and recommendations to preview the planned AI-guided journey, from conversational skills assessment to career matches informed by Malaysian labour-market data.</p>
+      <h2 id="features-title">Five steps from resume to roadmap</h2>
+      <p class="lede">The demo uses sample profiles to show how the planned journey works, from skills assessment to career matches based on Malaysian labour-market data.</p>
       <ol class="feature-grid">${steps.map(([mark, heading, description], index) => `<li class="panel feature"><div class="feature-top"><span class="tile-icon">${icon(mark, 20)}</span><span class="label">Step ${index + 1}</span></div><h3>${heading}</h3><p>${description}</p></li>`).join('')}</ol>
       ${button('Explore demo', 'persona', { mark: 'arrow' })}
     </section>
@@ -273,7 +273,7 @@ function landingView() {
 function uploadView() {
   return `<div class="onboarding content-width narrow">
     ${goButton('Back to welcome', 'welcome', 'plain', 'back')}
-    ${title('Resume upload', 'Start with what you’ve <em>already achieved.</em>', 'Choose a PDF or DOCX file to walk through the sample resume experience.')}
+    ${title('Resume upload', 'Start with a resume', 'Upload a PDF or DOCX file to generate a sample skills profile.')}
     <section class="panel upload-panel">
       <label id="dropzone" class="dropzone" for="resume-file">
         <input id="resume-file" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="sr-only" aria-describedby="upload-status upload-note" ${state.processing ? 'disabled' : ''}>
@@ -491,7 +491,7 @@ function dashboardView() {
     ['route', 'Roadmap completion', progress.percent + '%', 'roadmap', `${progress.done} of ${progress.total} tasks complete`]
   ];
   return `
-    ${title('Overview', 'Hi ' + escapeHTML(profile().name.trim().split(/\s+/)[0]) + ', your next<br class="wide-break"> career move <em>starts here.</em>', 'Review your sample skills, explore the strongest matches and plan what to learn next.', goButton('Explore Careers', 'careers'))}
+    ${title('Overview', 'Hi ' + escapeHTML(profile().name.trim().split(/\s+/)[0]) + ', here is your career overview', 'Your sample skills, the closest career matches and the next steps in your plan.', goButton('Explore Careers', 'careers'))}
     <section class="metric-grid" aria-label="Career summary">${metrics.map(([mark, label, value, view, note]) => `<button type="button" class="panel metric" data-action="go" data-value="${view}"><span class="metric-label"><span class="tile-icon">${icon(mark, 17)}</span>${label}</span><strong>${value}</strong><span>${note}</span></button>`).join('')}</section>
     <div class="dashboard-grid">
       <section class="panel dashboard-panel"><div class="section-head"><h2>Your Skills at a Glance</h2>${goButton('All skills', 'skills', 'plain')}</div>${known.length ? evidenceBars(known.slice(0, 6)) : '<p>Enter evidence in your profile to see your strongest sample skills here.</p>'}</section>
@@ -508,7 +508,7 @@ function skillsView() {
   const categories = [...new Set(skills.map(item => item.category))];
   const list = skills.filter(item => state.skillCategory === 'All' || state.skillCategory === item.category)
     .sort((a, b) => score(b.id) - score(a.id) || a.name.localeCompare(b.name));
-  return `${title('My skills', 'See your strengths, <em>clearly.</em>', 'See how your sample profile supports each skill on a resume evidence scale from 0 to 5.', goButton('Edit Profile', 'profile', 'secondary', 'user'))}
+  return `${title('My skills', 'Your skills and evidence scores', 'How your sample profile supports each skill, scored from 0 to 5.', goButton('Edit Profile', 'profile', 'secondary', 'user'))}
     ${skillsVisualizer()}
     <div class="dashboard-grid skills-grid">
       <section class="panel dashboard-panel">
@@ -556,7 +556,7 @@ function updateCareerResults() {
 
 function careersView() {
   const categories = ['All', ...new Set(jobs.map(job => job.category))];
-  return `${title('Career explorer', 'Career paths <em>worth exploring.</em>', 'Compare example roles across Malaysian industries and choose a target to see what to learn next.')}
+  return `${title('Career explorer', 'Career options in Malaysia', 'Compare example roles across Malaysian industries, then choose a target career.')}
     <div class="panel filter-bar">
       <label class="field search-field"><span>Search by job title</span><span class="search-input">${icon('search', 17)}<input type="search" name="career-search" value="${escapeHTML(state.careerSearch)}" placeholder="e.g. Data Analyst"></span></label>
       ${selectField('career-category', 'Industry', categories.map(item => [item, item === 'All' ? 'All industries' : item]), state.careerCategory)}
@@ -579,14 +579,14 @@ function roleDetails(id) {
 
 function gapView() {
   const job = targetJob();
-  if (!job) return `${title('Skill gap analysis', 'Know what to learn <em>next.</em>', '')}${emptyState('target', 'Choose a target career', 'Pick a career to compare your current evidence with the role’s sample requirements.', goButton('Explore Careers', 'careers'))}`;
+  if (!job) return `${title('Skill gap analysis', 'Skill gaps for your target career', '')}${emptyState('target', 'Choose a target career', 'Pick a career to compare your current evidence with the role’s sample requirements.', goButton('Explore Careers', 'careers'))}`;
   const gaps = gapsFor(job);
   const groups = [
     ['Strong skills', gaps.filter(item => item.gap === 0).length], ['Partial matches', gaps.filter(item => item.gap === 1).length],
     ['Priority gaps', gaps.filter(item => item.gap >= 2).length]
   ];
   const priorities = gaps.filter(item => item.gap > 0);
-  return `${title('Skill gap analysis', 'Know what to learn <em>next.</em>', 'Compare current evidence with the illustrative requirements for <strong>' + job.title + '</strong>.', goButton('Change Career', 'careers', 'secondary', 'compass'))}
+  return `${title('Skill gap analysis', 'Skill gaps for your target career', 'Your evidence compared with the sample requirements for <strong>' + job.title + '</strong>.', goButton('Change Career', 'careers', 'secondary', 'compass'))}
     <div class="gap-metrics">${groups.map(([heading, count]) => `<div class="panel gap-metric"><strong>${count}</strong><span>${heading}</span></div>`).join('')}</div>
     <section class="panel dashboard-panel">
       <div class="section-head"><h2>Current Evidence vs. Target</h2><span class="label">Scale 0–5</span></div>
@@ -660,7 +660,7 @@ function trainingView() {
   const role = targetJob() || rankedJobs()[0];
   const withAll = (list, heading) => [['All', heading], ...list];
   const availableSkills = [...new Set(courses.flatMap(item => item.skillIds))].sort((a, b) => skillName(a).localeCompare(skillName(b)));
-  return `${title('Upskilling hub', 'Close your skills gap with <em>Malaysian training pathways.</em>', 'Explore programme examples for ' + role.title + ' or browse the full catalogue.')}
+  return `${title('Upskilling hub', 'Training that closes your skills gap', 'Programme examples for ' + role.title + ', plus the full catalogue.')}
     ${notice('The catalogue uses mock programmes. Check official providers for available courses, fees, intake dates, recognition and eligibility.')}
     <div class="filter-chips view-filters">${[['suggested', 'Suggested for your gaps'], ['all', 'All pathways']].map(([value, label]) => button(label, 'training-view', { style: 'filter', value, attrs: `aria-pressed="${f.view === value}"` })).join('')}</div>
     <div class="panel filter-bar training-filters">
@@ -721,11 +721,11 @@ function roadmapProgress() {
 
 function roadmapView() {
   const job = targetJob();
-  if (!job) return `${title('My roadmap', 'Your next steps, <em>made practical.</em>', '')}${emptyState('route', 'Choose a target career', 'Pick a target role, then build a learning pathway from your sample skills.', goButton('Explore Careers', 'careers'))}`;
+  if (!job) return `${title('My roadmap', 'Your learning roadmap', '')}${emptyState('route', 'Choose a target career', 'Pick a target role, then build a learning pathway from your sample skills.', goButton('Explore Careers', 'careers'))}`;
   const plan = journey().roadmap;
   const progress = roadmapProgress();
   let week = 1;
-  return `${title('My roadmap', 'Your next steps, <em>made practical.</em>', 'Build a four-phase learning plan for <strong>' + job.title + '</strong>.', goButton('Change Career', 'careers', 'secondary', 'compass'))}
+  return `${title('My roadmap', 'Your learning roadmap', 'A four-phase learning plan for <strong>' + job.title + '</strong>.', goButton('Change Career', 'careers', 'secondary', 'compass'))}
     <section class="panel dashboard-panel">
       <div class="section-head"><h2>Learning schedule</h2>${chip('Simulated roadmap', true)}</div>
       <form class="roadmap-settings" id="roadmap-form">
@@ -773,7 +773,7 @@ function updateTask(control) {
 }
 
 function atlasView() {
-  return `${title('Skills Atlas', 'Where skills supply meets <em>industry demand.</em>', 'Explore illustrative training supply, hiring demand and skills gaps by state and district. Your profile’s location is outlined on the map.', chip('Demo data', true))}
+  return `${title('Skills Atlas', 'Skills supply, demand and gaps by state', 'Training places, hiring demand and skills gaps for each state and district, using illustrative demo data. Your profile’s location is outlined on the map.', chip('Demo data', true))}
     <section class="panel skills-atlas-panel">
       <div id="skills-atlas" class="skills-atlas"></div>
       <p class="atlas-footnote">State and district boundaries use official DOSM/open data. Supply, demand, gap, employer and institution figures are illustrative demo data — not live labour-market statistics.</p>
@@ -781,7 +781,7 @@ function atlasView() {
 }
 
 function settingsView() {
-  return `${title('My profile', 'Your profile and <em>preferences.</em>', 'Edit the example information that shapes your career matches and learning plan.', button('Change Demo Persona', 'persona', { style: 'secondary', mark: 'down' }))}
+  return `${title('My profile', 'Your profile and preferences', 'Edit the sample details that shape your career matches and learning plan.', button('Change Demo Persona', 'persona', { style: 'secondary', mark: 'down' }))}
     <div class="settings-grid">
       <form id="profile-form">${profileFields()}<button type="submit" class="button button-primary">Save Changes${icon('check', 17)}</button></form>
       <aside class="panel dashboard-panel settings-info">
