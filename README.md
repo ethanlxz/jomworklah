@@ -2,9 +2,20 @@
 
 JomWorkLah is an interactive career guidance prototype for Malaysian graduates and SPM and TVET leavers. It takes a fictional profile through skills evidence, career matching, gap analysis, training options and a learning roadmap.
 
-## Open the prototype
+## Repository layout
 
-Double-click `index.html` or open it from a modern browser. The app uses HTML, CSS, Tailwind’s browser CDN and vanilla JavaScript. Core screens and interactions work offline with local styles and system font fallbacks. An internet connection loads the optional typography, Tailwind utilities and official training sites.
+- `frontend/` is the Next.js app with both demos: the job-seeker site at `/candidate` and the employer site at `/employer`. The root URL redirects to `/candidate`.
+- `backend/` is the API the frontend is built against.
+
+## Run the frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open <http://localhost:3000/candidate> for the job-seeker walkthrough and <http://localhost:3000/employer> for talent search. The app uses HTML, CSS, Tailwind's browser CDN and vanilla JavaScript, so core screens and interactions work offline with local styles and system font fallbacks. An internet connection loads the optional typography, Tailwind utilities, the 3D atlas view and official training sites.
 
 ## Three-minute walkthrough
 
@@ -30,11 +41,13 @@ To demonstrate resume selection, use a sample PDF or DOCX up to 5 MB. **Generate
 
 ## Project files
 
-- `index.html` is the entry point, with `styles.css` for the design and responsive layout.
-- `js/mock-data.js` contains two fictional personas, eight career paths and ten example training pathways. `js/app.js` contains the interactions and scoring.
-- `skills-atlas.css`, `js/skills-atlas.js` and `js/skills-atlas-data.js` contain the scoped Skills Atlas map component, its state/district geometry data and its interactions.
-- `assets/jomworklah-logo.svg` contains the editable vector wordmark and route mark. `assets/jomworklah-mark.svg` is the standalone mark and favicon.
-- `assets/career-terrain.jpg` is the hero artwork, made with the built-in ImageGen tool.
+- `frontend/app/candidate/page.js` renders the job-seeker skeleton (header, sidebar, main, dialogs) that `frontend/public/js/app.js` fills in on boot.
+- `frontend/public/styles.css` holds the design and responsive layout; `frontend/public/skills-atlas.css` scopes the Skills Atlas map component.
+- `frontend/public/js/mock-data.js` contains two fictional personas, eight career paths and ten example training pathways. `frontend/public/js/app.js` contains the interactions and scoring.
+- `frontend/public/js/skills-atlas.js` and `frontend/public/js/skills-atlas-data.js` contain the map component, its state/district geometry data and its interactions.
+- `frontend/app/employer/` is the employer site: `data.js` and `scoring.js` hold the illustrative candidate profiles and match scoring, `talent-search.js` the candidate grid, `candidate-profile.js` the profile view and `contact-dialog.js` the contact flow. `frontend/public/employer.css` styles both.
+- `frontend/public/assets/jomworklah-logo.svg` contains the editable vector wordmark and route mark. `frontend/public/assets/jomworklah-mark.svg` is the standalone mark and favicon.
+- `frontend/public/assets/career-terrain.jpg` is the hero artwork, made with the built-in ImageGen tool.
 
 <details>
 <summary>Hero artwork prompt</summary>
