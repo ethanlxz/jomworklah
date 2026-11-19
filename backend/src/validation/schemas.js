@@ -1,6 +1,20 @@
 import { z } from 'zod';
 
-export const profilePatchSchema = z.object({
+// Renames frontend field names to canonical ones before validation; canonical keys win.
+const withAliases = (aliases, schema) => z.preprocess(input => {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return input;
+  const output = { ...input };
+  for (const [alias, canonical] of Object.entries(aliases)) {
+    if (!(alias in output)) continue;
+    if (!(canonical in output)) output[canonical] = output[alias];
+    delete output[alias];
+  }
+  return output;
+}, schema);
+
+const profileAliases = { field: 'fieldOfStudy', hours: 'weeklyHours', mode: 'learningMode' };
+
+const profileFields = {
   name: z.string().trim().min(1).max(120).optional(),
   headline: z.string().max(200).optional(),
   qualification: z.string().max(120).optional(),
@@ -11,10 +25,22 @@ export const profilePatchSchema = z.object({
   budget: z.enum(['RM0–RM500', 'RM501–RM1,500', 'Flexible']).optional(),
   weeklyHours: z.number().int().min(1).max(60).optional(),
   learningMode: z.enum(['Online', 'In person', 'Hybrid']).optional()
-});
+};
+
+const scoresField = z.record(z.string(), z.number().int().min(0).max(5));
+const interestsField = z.array(z.string().min(1).max(60)).max(20);
+
+export const profilePatchSchema = withAliases(profileAliases, z.object(profileFields));
+
+export const onboardingSchema = withAliases(profileAliases, z.object({
+  ...profileFields,
+  name: z.string().trim().min(1, 'Enter a name for the demo profile.').max(120),
+  interests: interestsField.optional(),
+  scores: scoresField.optional()
+}));
 
 export const skillsBulkSchema = z.object({
-  scores: z.record(z.string(), z.number().int().min(0).max(5))
+  scores: scoresField
 });
 
 export const skillPatchSchema = z.object({
@@ -22,21 +48,24 @@ export const skillPatchSchema = z.object({
 });
 
 export const interestsSchema = z.object({
-  interests: z.array(z.string().min(1).max(60)).max(20)
+  interests: interestsField
 });
 
-export const targetSchema = z.object({
+export const targetSchema = withAliases({ target: 'jobId' }, z.object({
   jobId: z.string().min(1).max(120)
-});
+}));
 
-export const courseSaveSchema = z.object({
+export const courseSaveSchema = withAliases({ id: 'courseId' }, z.object({
   courseId: z.string().min(1).max(120)
-});
+}));
 
-export const roadmapGenerateSchema = z.object({
-  weeklyHours: z.number().int().min(1).max(60),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD').nullable().optional().default(null)
-});
+export const roadmapGenerateSchema = withAliases({ hours: 'weeklyHours', 'start-date': 'startDate' }, z.object({
+  weeklyHours: z.coerce.number().int().min(1).max(60),
+  startDate: z.preprocess(
+    value => (value === '' ? null : value),
+    z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD').nullable().optional().default(null)
+  )
+}));
 
 export const taskPatchSchema = z.object({
   completed: z.boolean()

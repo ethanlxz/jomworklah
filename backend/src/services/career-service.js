@@ -1,4 +1,5 @@
 import { AppError } from '../middleware/errors.js';
+import { careerView } from '../api/serializers.js';
 import { compareText, compatibility, gapsFor, rankedCareers } from '../domain/scoring.js';
 import {
   loadInterestIds,
@@ -39,16 +40,7 @@ export function listCareers(db, userId, { query = '', category = 'All', sort = '
   return ranked.map(job => {
     const gaps = gapsFor(job.requirements, scoreFor, skillNameFor);
     return {
-      id: job.id,
-      title: job.title,
-      category: job.category,
-      sector: job.sector,
-      icon: job.icon,
-      summary: job.summary,
-      qualification: job.qualification,
-      fit: job.fit,
-      skillsMatch: job.skillsMatch,
-      interestMatch: job.interestMatch,
+      ...careerView(job),
       matchingSkills: gaps.filter(gap => gap.gap === 0).map(gap => skillNameFor(gap.skillId)),
       priorityGaps: gaps.filter(gap => gap.gap > 0).slice(0, 2).map(gap => ({
         skillId: gap.skillId,
@@ -78,9 +70,13 @@ export async function getCareer(db, userId, jobId, ai) {
     compatibility: compatibilityResult
   });
 
+  const gapBySkill = new Map(gaps.map(gap => [gap.skillId, gap]));
+
   return {
-    ...job,
-    requirements: gaps,
+    ...careerView(job),
+    requirements: job.requirements.map(requirement => gapBySkill.get(requirement.skillId)),
+    gaps,
+    fit: compatibilityResult.fit,
     compatibility: compatibilityResult,
     explanation
   };

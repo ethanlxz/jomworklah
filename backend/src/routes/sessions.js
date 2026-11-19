@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { createGuestSession } from '../services/session-service.js';
 import { createDemoSession, listPersonas } from '../services/demo-service.js';
-import { getProfile } from '../services/profile-service.js';
-import { getJourney } from '../services/journey-service.js';
+import { getMe } from '../services/profile-service.js';
 import { validateBody } from '../middleware/validate.js';
 import { personaSchema } from '../validation/schemas.js';
 
@@ -12,14 +11,7 @@ export function sessionsRouter() {
   router.post('/session', (req, res) => {
     const db = req.app.locals.db;
     const { token, user } = createGuestSession(db);
-    res.status(201).json({
-      data: {
-        token,
-        user,
-        profile: getProfile(db, user.id),
-        journey: getJourney(db, user.id)
-      }
-    });
+    res.status(201).json({ data: { token, ...getMe(db, user.id, user) } });
   });
 
   router.get('/demo/personas', (req, res) => {
@@ -29,15 +21,9 @@ export function sessionsRouter() {
 
   router.post('/demo/session', validateBody(personaSchema), (req, res) => {
     const db = req.app.locals.db;
-    const { token, userId } = createDemoSession(db, req.body.personaKey);
-    res.status(201).json({
-      data: {
-        token,
-        user: { id: userId, kind: 'demo_clone' },
-        profile: getProfile(db, userId),
-        journey: getJourney(db, userId)
-      }
-    });
+    const { token, userId, personaKey } = createDemoSession(db, req.body.personaKey);
+    const user = { id: userId, kind: 'demo_clone', personaKey };
+    res.status(201).json({ data: { token, ...getMe(db, userId, user) } });
   });
 
   return router;

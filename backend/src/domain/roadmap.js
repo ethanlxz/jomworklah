@@ -15,19 +15,23 @@ function foundationTask(skillId, skillNameFor) {
   return { id: `skill-${skillId}`, title, courseId: null };
 }
 
-export function buildRoadmap({ job, scoreFor, skillNameFor, profile, courses, savedCourseIds = [], weeklyHours }) {
-  const gaps = gapsFor(job.requirements, scoreFor, skillNameFor);
-  const positive = gaps.filter(item => item.gap > 0);
+// Mirrors the prototype's generateSnapshot(): top 3 gap skills and top 2 unsaved relevant courses.
+export function deriveRoadmapInputs({ job, scoreFor, skillNameFor, profile, courses, savedCourseIds = [] }) {
+  const positive = gapsFor(job.requirements, scoreFor, skillNameFor).filter(item => item.gap > 0);
+  return {
+    skillIds: positive.slice(0, 3).map(item => item.skillId),
+    courseIds: rankedCourses(courses, positive, profile)
+      .filter(course => course.relevance > 0 && !savedCourseIds.includes(course.id))
+      .slice(0, 2)
+      .map(course => course.id)
+  };
+}
 
-  const gapSkillIds = positive.slice(0, 3).map(item => item.skillId);
+export function buildRoadmap({ job, scoreFor, skillNameFor, profile, courses, savedCourseIds = [], weeklyHours, snapshot = null }) {
+  const { skillIds: gapSkillIds, courseIds: suggestedCourseIds } = snapshot
+    ?? deriveRoadmapInputs({ job, scoreFor, skillNameFor, profile, courses, savedCourseIds });
 
   const courseById = new Map(courses.map(course => [course.id, course]));
-  const ranked = rankedCourses(courses, positive, profile);
-  const suggestedCourseIds = ranked
-    .filter(course => course.relevance > 0 && !savedCourseIds.includes(course.id))
-    .slice(0, 2)
-    .map(course => course.id);
-
   const trainingCourseIds = [...new Set([...suggestedCourseIds, ...savedCourseIds])];
 
   const foundation = gapSkillIds.map(skillId => foundationTask(skillId, skillNameFor));

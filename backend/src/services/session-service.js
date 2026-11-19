@@ -25,7 +25,7 @@ export function issueToken(db, userId, { expiresAt = null } = {}) {
 export function resolveSession(db, token) {
   if (!token) return null;
   const row = db.prepare(`
-    SELECT s.token_hash, s.expires_at, u.id, u.kind, u.persona_key
+    SELECT s.token_hash, s.expires_at, u.id, u.kind, COALESCE(u.persona_key, u.source_persona) AS persona_key
     FROM sessions s JOIN users u ON u.id = s.user_id
     WHERE s.token_hash = ?
   `).get(hashToken(token));

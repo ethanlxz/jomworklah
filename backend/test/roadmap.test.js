@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { courses, jobs, personas, skills } from '../src/db/seed-data.js';
-import { buildRoadmap, computeProgress, flattenTasks, phaseWeeks } from '../src/domain/roadmap.js';
+import { buildRoadmap, computeProgress, deriveRoadmapInputs, flattenTasks, phaseWeeks } from '../src/domain/roadmap.js';
 
 const skillName = id => skills.find(skill => skill.id === id)?.name ?? id;
 const jobById = id => jobs.find(job => job.id === id);
@@ -104,6 +104,25 @@ test('saved courses are unioned without duplicating snapshot courses', () => {
   assert.ok(ids.includes('course-dashboard-design'));
   assert.ok(ids.includes('course-campaign-measurement'));
   assert.ok(ids.includes('course-sql-foundations'));
+});
+
+test('a stored snapshot overrides live skill scores', () => {
+  const job = jobById('junior-data-analyst');
+  const inputs = {
+    job,
+    scoreFor: scoreFor(personas.aina),
+    skillNameFor: skillName,
+    profile: profile(personas.aina),
+    courses
+  };
+  const snapshot = deriveRoadmapInputs(inputs);
+  assert.deepEqual(snapshot, {
+    skillIds: ['sql', 'data-viz', 'python'],
+    courseIds: ['dashboard-design', 'sql-foundations']
+  });
+
+  const phases = buildRoadmap({ ...inputs, scoreFor: () => 5, weeklyHours: 5, snapshot });
+  assert.deepEqual(phases[0].tasks.map(task => task.id), ['skill-sql', 'skill-data-viz', 'skill-python']);
 });
 
 test('progress counts completed tasks and finds the next one', () => {

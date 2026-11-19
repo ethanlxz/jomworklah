@@ -16,7 +16,13 @@ test('health and public catalogue are available without auth', async t => {
   assert.equal(skills.body.data.legend.length, 6);
 
   const interests = await api(ctx.base, 'GET', '/api/interests');
-  assert.equal(interests.body.data.length, 7);
+  assert.equal(interests.body.meta.count, 7);
+  assert.equal(interests.body.data.data, 'Data & analytics');
+
+  const providers = await api(ctx.base, 'GET', '/api/providers');
+  assert.equal(providers.status, 200);
+  assert.deepEqual(providers.body.data.elatih, { name: 'HRD Corp e-LATiH', url: 'https://elatih.hrdcorp.gov.my/' });
+  assert.equal(Object.keys(providers.body.data).length, 5);
 });
 
 test('session bootstrap creates a guest and requires auth elsewhere', async t => {
@@ -51,8 +57,11 @@ test('demo personas clone without touching templates', async t => {
   const first = await api(ctx.base, 'POST', '/api/demo/session', { body: { personaKey: 'aina' } });
   assert.equal(first.status, 201);
   assert.equal(first.body.data.user.kind, 'demo_clone');
+  assert.equal(first.body.data.user.personaKey, 'aina');
   assert.equal(first.body.data.profile.name, 'Aina Rahman');
-  assert.equal(first.body.data.journey.targetJobId, 'junior-data-analyst');
+  assert.equal(first.body.data.journey.started, false);
+  assert.equal(first.body.data.journey.targetJobId, null);
+  assert.equal(personas.body.data[0].targetJobId, 'junior-data-analyst');
 
   const update = await api(ctx.base, 'PATCH', '/api/me/profile', {
     token: first.body.data.token,
@@ -86,7 +95,9 @@ test('career ranking and detail match prototype parity', async t => {
   const detail = await api(ctx.base, 'GET', '/api/careers/junior-data-analyst', { token });
   assert.equal(detail.status, 200);
   assert.deepEqual(detail.body.data.compatibility, { skillsMatch: 54, interestMatch: 100, fit: 61 });
-  const positive = detail.body.data.requirements.filter(requirement => requirement.gap > 0);
+  assert.deepEqual(detail.body.data.requirements.map(requirement => requirement.skillId),
+    ['excel', 'sql', 'python', 'data-viz', 'communication']);
+  const positive = detail.body.data.gaps.filter(requirement => requirement.gap > 0);
   assert.deepEqual(positive.map(requirement => requirement.skillId), ['sql', 'data-viz', 'python']);
   assert.equal(typeof detail.body.data.explanation, 'string');
   assert.ok(detail.body.data.explanation.includes('54%'));
@@ -98,7 +109,7 @@ test('career ranking and detail match prototype parity', async t => {
 test('training is filtered and ranked by relevance', async t => {
   const ctx = await makeTestApp();
   t.after(() => ctx.close());
-  const token = await demoToken(ctx.base, 'aina');
+  const token = await demoToken(ctx.base, 'aina', { target: 'junior-data-analyst' });
 
   const suggested = await api(ctx.base, 'GET', '/api/training?view=suggested', { token });
   assert.equal(suggested.status, 200);
@@ -116,7 +127,13 @@ test('training is filtered and ranked by relevance', async t => {
 
   const detail = await api(ctx.base, 'GET', '/api/training/sql-foundations', { token });
   assert.equal(detail.status, 200);
-  assert.equal(detail.body.data.provider.name, 'HRD Corp e-LATiH');
+  assert.equal(detail.body.data.provider, 'elatih');
+  assert.equal(detail.body.data.providerName, 'HRD Corp e-LATiH');
+
+  const bySource = await api(ctx.base, 'GET', '/api/training?view=all&source=tvet', { token });
+  assert.ok(bySource.body.data.length > 0);
+  assert.ok(bySource.body.data.every(course => course.provider === 'tvet'));
+  assert.equal(bySource.body.meta.providers.tvet.name, 'UP_TVET');
 });
 
 test('profile, skills and interests can be updated with validation', async t => {
@@ -166,7 +183,7 @@ test('profile, skills and interests can be updated with validation', async t => 
 test('roadmap generation, task toggles and regeneration preserve completions', async t => {
   const ctx = await makeTestApp();
   t.after(() => ctx.close());
-  const token = await demoToken(ctx.base, 'aina');
+  const token = await demoToken(ctx.base, 'aina', { target: 'junior-data-analyst' });
 
   const empty = await api(ctx.base, 'GET', '/api/me/roadmap', { token });
   assert.equal(empty.status, 200);
@@ -204,11 +221,12 @@ test('roadmap generation, task toggles and regeneration preserve completions', a
   assert.equal(reset.body.data.done, 0);
 });
 
-test('changing target invalidates an existing roadmap', async t => {
+test('changing target invalidates the roadmap and saved courses', async t => {
   const ctx = await makeTestApp();
   t.after(() => ctx.close());
-  const token = await demoToken(ctx.base, 'aina');
+  const token = await demoToken(ctx.base, 'aina', { target: 'junior-data-analyst' });
 
+  await api(ctx.base, 'POST', '/api/me/courses', { token, body: { courseId: 'campaign-measurement' } });
   await api(ctx.base, 'POST', '/api/me/roadmap', { token, body: { weeklyHours: 5 } });
   const target = await api(ctx.base, 'PUT', '/api/me/target', {
     token,
@@ -217,9 +235,16 @@ test('changing target invalidates an existing roadmap', async t => {
   assert.equal(target.status, 200);
   assert.equal(target.body.data.invalidated, true);
   assert.equal(target.body.data.journey.targetJobId, 'automotive-technician');
+  assert.deepEqual(target.body.data.journey.added, []);
 
   const roadmap = await api(ctx.base, 'GET', '/api/me/roadmap', { token });
   assert.equal(roadmap.body.data, null);
+
+  const courses = await api(ctx.base, 'GET', '/api/me/courses', { token });
+  assert.deepEqual(courses.body.data, []);
+
+  const same = await api(ctx.base, 'PUT', '/api/me/target', { token, body: { target: 'automotive-technician' } });
+  assert.equal(same.body.data.invalidated, false);
 
   const unknown = await api(ctx.base, 'PUT', '/api/me/target', { token, body: { jobId: 'nope' } });
   assert.equal(unknown.status, 404);
@@ -228,10 +253,16 @@ test('changing target invalidates an existing roadmap', async t => {
 test('saved courses appear in the roadmap training phase', async t => {
   const ctx = await makeTestApp();
   t.after(() => ctx.close());
-  const token = await demoToken(ctx.base, 'aina');
+  const untargeted = await demoToken(ctx.base, 'aina');
+  const early = await api(ctx.base, 'POST', '/api/me/courses', { token: untargeted, body: { courseId: 'campaign-measurement' } });
+  assert.equal(early.status, 409);
+  assert.equal(early.body.error.code, 'TARGET_REQUIRED');
+
+  const token = await demoToken(ctx.base, 'aina', { target: 'junior-data-analyst' });
 
   const saved = await api(ctx.base, 'POST', '/api/me/courses', { token, body: { courseId: 'campaign-measurement' } });
   assert.equal(saved.status, 201);
+  assert.equal(saved.body.data.provider, 'mahir');
 
   const duplicate = await api(ctx.base, 'POST', '/api/me/courses', { token, body: { courseId: 'campaign-measurement' } });
   assert.equal(duplicate.status, 409);
@@ -268,7 +299,7 @@ test('roadmap generation requires a target and a valid body', async t => {
 test('journey clear and user deletion remove derived data', async t => {
   const ctx = await makeTestApp();
   t.after(() => ctx.close());
-  const token = await demoToken(ctx.base, 'aina');
+  const token = await demoToken(ctx.base, 'aina', { target: 'junior-data-analyst' });
 
   await api(ctx.base, 'POST', '/api/me/courses', { token, body: { courseId: 'sql-foundations' } });
   await api(ctx.base, 'POST', '/api/me/roadmap', { token, body: { weeklyHours: 5 } });
